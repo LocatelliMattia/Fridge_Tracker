@@ -1,0 +1,18 @@
+{
+  "name": "Frigo Tracker",
+  "short_name": "Frigo",
+  "description": "Tiene traccia degli alimenti in frigorifero e suggerisce cosa consumare in base alla scadenza.",
+  "start_url": "./index.html",
+  "display": "fullscreen",
+  "orientation": "portrait",
+  "background_color": "#F4F6F3",
+  "theme_color": "#1F2A24",
+  "icons": [
+    {
+      "src": "icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
