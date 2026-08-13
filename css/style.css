@@ -1,0 +1,349 @@
+/* Design tokens
+   Palette: cool sage/forest, tuned for a kitchen touchscreen rather than
+   a marketing page. Status colors follow the freshness of an item and
+   are functional, not decorative (fresh -> expired reads left to right
+   as a traffic-light gradient). */
+
+:root {
+  --bg: #F4F6F3;
+  --surface: #FFFFFF;
+  --text-primary: #1F2A24;
+  --text-secondary: #5B6B60;
+  --border: #DCE3DD;
+
+  --accent: #3F7A5C;
+  --accent-dark: #2C5943;
+  --accent-contrast: #FFFFFF;
+
+  --status-fresh: #3F7A5C;
+  --status-soon: #C98A1F;
+  --status-urgent: #D9722B;
+  --status-expired: #C6493B;
+
+  --font-display: 'Space Grotesk', system-ui, sans-serif;
+  --font-body: system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  --radius: 14px;
+  --tap-min: 48px;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  /* Kiosk display: no accidental text selection or pull-to-refresh */
+  -webkit-user-select: none;
+  user-select: none;
+  overscroll-behavior-y: contain;
+}
+
+button, input, select {
+  font-family: inherit;
+}
+
+/* Header + tab navigation */
+
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 16px 20px 0;
+}
+
+.app-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 22px;
+  margin: 0 0 12px;
+}
+
+.tab-nav {
+  display: flex;
+  gap: 4px;
+}
+
+.tab-btn {
+  flex: 1;
+  min-height: var(--tap-min);
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 15px;
+  font-weight: 500;
+  border-bottom: 3px solid transparent;
+  cursor: pointer;
+}
+
+.tab-btn.is-active {
+  color: var(--accent-dark);
+  border-bottom-color: var(--accent);
+}
+
+/* View switching */
+
+main {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 16px 16px 80px;
+}
+
+.view { display: none; }
+.view.is-active { display: block; }
+
+/* Summary bar on the "in frigo" list */
+
+.summary-bar {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin-bottom: 12px;
+}
+
+/* Item list + cards (cards are built in app.js) */
+
+.item-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.item-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 6px solid var(--status-fresh);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.item-card.status-soon { border-left-color: var(--status-soon); }
+.item-card.status-urgent { border-left-color: var(--status-urgent); }
+.item-card.status-expired { border-left-color: var(--status-expired); }
+
+.item-card-main { min-width: 0; }
+
+.item-card-name {
+  font-weight: 500;
+  font-size: 16px;
+  margin: 0 0 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.item-card-meta {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.item-card-expiry {
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.item-card-expiry.status-fresh { color: var(--status-fresh); }
+.item-card-expiry.status-soon { color: var(--status-soon); }
+.item-card-expiry.status-urgent { color: var(--status-urgent); }
+.item-card-expiry.status-expired { color: var(--status-expired); }
+
+.item-card-delete {
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  min-width: var(--tap-min);
+  min-height: var(--tap-min);
+}
+
+.empty-state {
+  text-align: center;
+  color: var(--text-secondary);
+  padding: 40px 20px;
+  font-size: 15px;
+}
+
+/* Meal picker (suggestion view) */
+
+.meal-picker {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.meal-btn {
+  min-height: var(--tap-min);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  border-radius: var(--radius);
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.meal-btn.is-active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-contrast);
+}
+
+/* Add-item flow */
+
+.add-step { display: flex; flex-direction: column; gap: 12px; }
+
+.primary-btn {
+  min-height: 56px;
+  background: var(--accent);
+  color: var(--accent-contrast);
+  border: none;
+  border-radius: var(--radius);
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.primary-btn:active { background: var(--accent-dark); }
+
+.secondary-btn {
+  min-height: var(--tap-min);
+  background: var(--surface);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 15px;
+  cursor: pointer;
+}
+
+#scanner-viewport {
+  background: #000;
+  border-radius: var(--radius);
+  overflow: hidden;
+  min-height: 260px;
+}
+
+.hint-text {
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 14px;
+  margin: 0;
+}
+
+/* Item form */
+
+.item-form {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+}
+
+.item-form label {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-bottom: 14px;
+}
+
+.item-form input,
+.item-form select {
+  -webkit-user-select: text;
+  user-select: text;
+  display: block;
+  width: 100%;
+  min-height: var(--tap-min);
+  margin-top: 4px;
+  padding: 0 12px;
+  font-size: 15px;
+  color: var(--text-primary);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.form-status {
+  font-size: 13px;
+  color: var(--accent-dark);
+  min-height: 18px;
+}
+
+.quantity-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 8px;
+}
+
+.meal-tags-field {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-bottom: 14px;
+}
+
+.meal-tags-field legend {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  padding: 0 4px;
+}
+
+.checkbox-label {
+  display: flex !important;
+  align-items: center;
+  gap: 8px;
+  font-weight: 400 !important;
+  color: var(--text-primary) !important;
+  min-height: 40px;
+}
+
+.checkbox-label input { width: auto; min-height: auto; }
+
+.nutrition-details {
+  margin-bottom: 14px;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.nutrition-details summary {
+  cursor: pointer;
+  font-weight: 500;
+  padding: 8px 0;
+}
+
+.nutrition-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.nutrition-grid label {
+  margin-bottom: 0;
+}
+
+.form-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+@media (min-width: 480px) {
+  .meal-picker { grid-template-columns: repeat(4, 1fr); }
+}
