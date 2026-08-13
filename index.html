@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Frigo Tracker</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1F2A24">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="app-header">
+  <h1 class="app-title">Frigo Tracker</h1>
+  <nav class="tab-nav" id="tab-nav">
+    <button class="tab-btn is-active" data-view="list">In frigo</button>
+    <button class="tab-btn" data-view="suggest">Cosa mangio</button>
+    <button class="tab-btn" data-view="add">Aggiungi</button>
+  </nav>
+</header>
+
+<main>
+
+  <!-- VIEW: List of everything currently in the fridge -->
+  <section id="view-list" class="view is-active">
+    <div class="summary-bar" id="summary-bar"></div>
+    <ul class="item-list" id="item-list"></ul>
+    <p class="empty-state" id="list-empty-state" hidden>
+      Il frigo è vuoto. Tocca <strong>Aggiungi</strong> per scansionare il primo alimento.
+    </p>
+  </section>
+
+  <!-- VIEW: Meal-based suggestions -->
+  <section id="view-suggest" class="view">
+    <div class="meal-picker" id="meal-picker">
+      <button class="meal-btn is-active" data-meal="breakfast">Colazione</button>
+      <button class="meal-btn" data-meal="lunch">Pranzo</button>
+      <button class="meal-btn" data-meal="dinner">Cena</button>
+      <button class="meal-btn" data-meal="snack">Spuntino</button>
+    </div>
+    <ul class="item-list" id="suggest-list"></ul>
+    <p class="empty-state" id="suggest-empty-state" hidden>
+      Nessun alimento adatto a questo pasto al momento.
+    </p>
+  </section>
+
+  <!-- VIEW: Add a new item -->
+  <section id="view-add" class="view">
+
+    <!-- Add step 1: choose how to add -->
+    <div class="add-step" id="add-step-choice">
+      <button class="primary-btn" id="btn-start-scan">Scansiona barcode</button>
+      <button class="secondary-btn" id="btn-manual-entry">Inserisci manualmente</button>
+    </div>
+
+    <!-- Add step 2: camera scanning -->
+    <div class="add-step" id="add-step-scan" hidden>
+      <div id="scanner-viewport"></div>
+      <p class="hint-text">Inquadra il codice a barre della confezione.</p>
+      <button class="secondary-btn" id="btn-cancel-scan">Annulla</button>
+    </div>
+
+    <!-- Add step 3: confirm / fill product details -->
+    <form class="add-step item-form" id="add-step-form" hidden>
+      <p class="form-status" id="form-status"></p>
+
+      <label>
+        Nome
+        <input type="text" id="field-name" required>
+      </label>
+
+      <label>
+        Marca
+        <input type="text" id="field-brand">
+      </label>
+
+      <label>
+        Categoria
+        <input type="text" id="field-category">
+      </label>
+
+      <label>
+        Data di scadenza
+        <input type="date" id="field-expiry" required>
+      </label>
+
+      <label>
+        Quantità
+        <div class="quantity-row">
+          <input type="number" id="field-quantity" min="1" step="1" value="1">
+          <select id="field-unit">
+            <option value="pz">pz</option>
+            <option value="g">g</option>
+            <option value="ml">ml</option>
+          </select>
+        </div>
+      </label>
+
+      <fieldset class="meal-tags-field">
+        <legend>Adatto per (lascia vuoto = qualsiasi pasto)</legend>
+        <label class="checkbox-label"><input type="checkbox" name="mealTag" value="breakfast"> Colazione</label>
+        <label class="checkbox-label"><input type="checkbox" name="mealTag" value="lunch"> Pranzo</label>
+        <label class="checkbox-label"><input type="checkbox" name="mealTag" value="dinner"> Cena</label>
+        <label class="checkbox-label"><input type="checkbox" name="mealTag" value="snack"> Spuntino</label>
+      </fieldset>
+
+      <details class="nutrition-details">
+        <summary>Valori nutrizionali (per 100g)</summary>
+        <div class="nutrition-grid">
+          <label>Energia (kcal) <input type="number" id="field-kcal"></label>
+          <label>Proteine (g) <input type="number" id="field-proteins"></label>
+          <label>Carboidrati (g) <input type="number" id="field-carbs"></label>
+          <label>Zuccheri (g) <input type="number" id="field-sugars"></label>
+          <label>Grassi (g) <input type="number" id="field-fat"></label>
+          <label>Fibre (g) <input type="number" id="field-fiber"></label>
+          <label>Sale (g) <input type="number" id="field-salt"></label>
+        </div>
+      </details>
+
+      <div class="form-actions">
+        <button type="button" class="secondary-btn" id="btn-discard-form">Annulla</button>
+        <button type="submit" class="primary-btn">Salva nel frigo</button>
+      </div>
+    </form>
+
+  </section>
+
+</main>
+
+<!-- html5-qrcode: browser-based barcode/QR scanning, no build step needed -->
+<script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+
+<script src="js/db.js"></script>
+<script src="js/openFoodFacts.js"></script>
+<script src="js/scanner.js"></script>
+<script src="js/recommend.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
