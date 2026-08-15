@@ -178,8 +178,21 @@ async function cancelScanning() {
 }
 
 function handleScanError(err) {
-  alert('Non riesco ad accedere alla fotocamera. Controlla i permessi del browser.');
   console.error(err);
+
+  if (err && err.code === 'INSECURE_CONTEXT') {
+    alert(
+      'La fotocamera funziona solo su una connessione HTTPS (o su localhost). ' +
+      'Stai aprendo il sito con http:// dalla rete locale: il browser blocca la ' +
+      'fotocamera anche se i permessi sono concessi. Serve pubblicare il sito su ' +
+      'HTTPS (es. GitHub Pages) oppure usare un tunnel HTTPS per i test (es. ngrok).'
+    );
+  } else if (err && err.code === 'NO_MEDIA_DEVICES') {
+    alert('Questo browser non espone l\'API della fotocamera. Prova con Chrome o Safari aggiornati.');
+  } else {
+    alert('Non riesco ad accedere alla fotocamera. Controlla i permessi del browser.');
+  }
+
   showAddStep('add-step-choice');
 }
 

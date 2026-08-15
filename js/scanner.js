@@ -19,6 +19,24 @@ let scannerInstance = null;
  * then automatically stops the camera (caller restarts it if needed).
  */
 async function startScanning(onDetected, onError) {
+  // getUserMedia is only available in a "secure context": HTTPS, or
+  // http://localhost. Accessing the app via http://<lan-ip>:port from
+  // another device (the tablet) does NOT count, even with camera
+  // permission granted — the browser blocks the API before any prompt.
+  if (!window.isSecureContext) {
+    const err = new Error('Camera requires a secure context (HTTPS or localhost).');
+    err.code = 'INSECURE_CONTEXT';
+    if (onError) onError(err);
+    return;
+  }
+
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    const err = new Error('Camera API not available in this browser.');
+    err.code = 'NO_MEDIA_DEVICES';
+    if (onError) onError(err);
+    return;
+  }
+
   scannerInstance = new Html5Qrcode(SCANNER_ELEMENT_ID, {
     formatsToSupport: SUPPORTED_FORMATS,
     verbose: false,
