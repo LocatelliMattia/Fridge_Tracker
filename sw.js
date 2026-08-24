@@ -3,7 +3,7 @@
 // be fetched fresh, and if the tablet is offline the add-item flow will
 // simply fall back to manual entry (handled in app.js).
 
-const CACHE_NAME = 'fridge-tracker-shell-v1';
+const CACHE_NAME = 'fridge-tracker-shell-v2';
 
 const SHELL_FILES = [
   './',

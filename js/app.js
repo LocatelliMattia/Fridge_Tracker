@@ -321,4 +321,12 @@ function registerServiceWorker() {
   }
 }
 
+// Auto reload the page when a new service worker takes control, so the user
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    console.log('Nuova versione disponibile, ricarico...');
+    window.location.reload();
+  });
+}
+
 document.addEventListener('DOMContentLoaded', init);
