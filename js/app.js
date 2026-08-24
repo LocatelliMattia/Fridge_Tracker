@@ -221,7 +221,7 @@ async function handleBarcodeDetected(barcode) {
     console.error('DEBUG - Product lookup failed:', err);
     
     showFormStep({
-      statusText: `Error: ${err.message}. Please enter details manually.`,
+      statusText: `Error: ${err.message}. Please enter details manually. `,
     });
   }
 }
