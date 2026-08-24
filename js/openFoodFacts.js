@@ -55,15 +55,22 @@ function normalizeProduct(product) {
     category: firstCategory(product.categories),
     nutriscore: product.nutriscore_grade || null,
     nutriments: {
-      energyKcal: numberOrNull(n['energy-kcal_100g']),
-      proteins: numberOrNull(n.proteins_100g),
-      carbs: numberOrNull(n.carbohydrates_100g),
-      sugars: numberOrNull(n.sugars_100g),
-      fat: numberOrNull(n.fat_100g),
-      fiber: numberOrNull(n.fiber_100g),
-      salt: numberOrNull(n.salt_100g),
+      // Use clean numeric conversion here, not the DOM-reading function from app.js
+      energyKcal: cleanNumber(n['energy-kcal_100g']),
+      proteins: cleanNumber(n.proteins_100g),
+      carbs: cleanNumber(n.carbohydrates_100g),
+      sugars: cleanNumber(n.sugars_100g),
+      fat: cleanNumber(n.fat_100g),
+      fiber: cleanNumber(n.fiber_100g),
+      salt: cleanNumber(n.salt_100g),
     },
   };
+}
+
+// Pure helper function for numeric conversion
+function cleanNumber(value) {
+  const n = Number(value);
+  return Number.isFinite(n) ? n : null;
 }
 
 function firstCategory(categoriesString) {
@@ -74,10 +81,11 @@ function firstCategory(categoriesString) {
   return parts[parts.length - 1] || parts[0] || null;
 }
 
-function numberOrNull(value) {
-  const n = Number(value);
-  return Number.isFinite(n) ? n : null;
-}
+// --- deprecated function ---
+// function numberOrNull(value) {
+//   const n = Number(value);
+//   return Number.isFinite(n) ? n : null;
+// }
 
 window.OpenFoodFacts = {
   lookupByBarcode,

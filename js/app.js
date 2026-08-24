@@ -211,16 +211,17 @@ async function handleBarcodeDetected(barcode) {
   try {
     const product = await window.OpenFoodFacts.lookupByBarcode(barcode);
     if (product) {
-      showFormStep({ product, statusText: 'Prodotto trovato su Open Food Facts.' });
+      showFormStep({ product, statusText: 'Product found on Open Food Facts.' });
     } else {
       showFormStep({
-        statusText: `Codice ${barcode} non trovato nel database. Compila i dati a mano.`,
+        statusText: `Code ${barcode} not found in database. Please enter details manually.`,
       });
     }
   } catch (err) {
-    console.error('Product lookup failed', err);
+    console.error('DEBUG - Product lookup failed:', err);
+    
     showFormStep({
-      statusText: 'Errore di rete durante la ricerca del prodotto. Compila i dati a mano.',
+      statusText: `Error: ${err.message}. Please enter details manually.`,
     });
   }
 }
@@ -230,28 +231,36 @@ async function handleBarcodeDetected(barcode) {
  * `product` follows the shape returned by OpenFoodFacts.lookupByBarcode.
  */
 function showFormStep({ product = null, statusText = '', loading = false } = {}) {
+  // Ensure the form is revealed in the DOM before accessing its elements
   showAddStep('add-step-form');
 
   const form = document.getElementById('add-step-form');
   form.reset();
 
-  document.getElementById('form-status').textContent = loading ? 'Ricerca prodotto…' : statusText;
+  document.getElementById('form-status').textContent = loading ? 'Searching product...' : statusText;
 
-  document.getElementById('field-name').value = product?.name || '';
-  document.getElementById('field-brand').value = product?.brand || '';
-  document.getElementById('field-category').value = product?.category || '';
-  document.getElementById('field-expiry').value = defaultExpiryDate();
-  document.getElementById('field-quantity').value = 1;
-  document.getElementById('field-unit').value = 'pz';
+  // Only attempt to fill fields if we have a product object
+  if (product) {
+    document.getElementById('field-name').value = product.name || '';
+    document.getElementById('field-brand').value = product.brand || '';
+    document.getElementById('field-category').value = product.category || '';
+    
+    // Set default expiry date
+    document.getElementById('field-expiry').value = defaultExpiryDate();
 
-  const n = product?.nutriments || {};
-  document.getElementById('field-kcal').value = n.energyKcal ?? '';
-  document.getElementById('field-proteins').value = n.proteins ?? '';
-  document.getElementById('field-carbs').value = n.carbs ?? '';
-  document.getElementById('field-sugars').value = n.sugars ?? '';
-  document.getElementById('field-fat').value = n.fat ?? '';
-  document.getElementById('field-fiber').value = n.fiber ?? '';
-  document.getElementById('field-salt').value = n.salt ?? '';
+    // Fill nutrition if available
+    if (product.nutriments) {
+      const n = product.nutriments;
+      // Use optional chaining and fallback to empty string
+      document.getElementById('field-kcal').value = n.energyKcal ?? '';
+      document.getElementById('field-proteins').value = n.proteins ?? '';
+      document.getElementById('field-carbs').value = n.carbs ?? '';
+      document.getElementById('field-sugars').value = n.sugars ?? '';
+      document.getElementById('field-fat').value = n.fat ?? '';
+      document.getElementById('field-fiber').value = n.fiber ?? '';
+      document.getElementById('field-salt').value = n.salt ?? '';
+    }
+  }
 }
 
 // Sensible starting point for the date picker — the user almost always
@@ -299,9 +308,9 @@ async function handleFormSubmit(event) {
 }
 
 function numberOrNull(fieldId) {
-  const raw = document.getElementById(fieldId).value;
-  if (raw === '') return null;
-  const n = Number(raw);
+  const el = document.getElementById(fieldId).value;
+  if (!el) return null;
+  const n = Number(el.value);
   return Number.isFinite(n) ? n : null;
 }
 
