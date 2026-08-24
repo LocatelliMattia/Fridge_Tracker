@@ -44,7 +44,15 @@ async function startScanning(onDetected, onError) {
 
   const config = {
     fps: 10,
-    qrbox: { width: 260, height: 160 }, // wide box suits 1D barcodes
+    qrbox: { width: 280, height: 180 }, // wide box suits 1D barcodes
+    // Ask for a higher-resolution stream than the library's default —
+    // sharper frames make more difference for barcode decoding than
+    // almost anything else we can control from JS.
+    videoConstraints: {
+      facingMode: 'environment',
+      width: { ideal: 1920 },
+      height: { ideal: 1080 },
+    },
   };
 
   try {
@@ -60,6 +68,21 @@ async function startScanning(onDetected, onError) {
         // scanning, intentionally ignored (not a real error).
       }
     );
+
+    // Force continuous autofocus where supported. This only works on
+    // Android Chrome/Edge via the Image Capture API — iOS Safari does not
+    // expose focus control to web pages at all, so this is a best-effort
+    // improvement, not a guaranteed fix. Devices with a fixed-focus camera
+    // (common on older/cheap tablets) can't be helped by software at all;
+    // the workaround there is finding the lens's fixed focal distance by
+    // moving the device back and forth (usually ~15-25cm).
+    try {
+      await scannerInstance.applyVideoConstraints({
+        advanced: [{ focusMode: 'continuous' }],
+      });
+    } catch (focusErr) {
+      console.warn('Continuous autofocus not supported on this device', focusErr);
+    }
   } catch (err) {
     console.error('Could not start camera for scanning', err);
     if (onError) onError(err);

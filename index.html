@@ -53,7 +53,18 @@
     <!-- Add step 1: choose how to add -->
     <div class="add-step" id="add-step-choice">
       <button class="primary-btn" id="btn-start-scan">Scansiona barcode</button>
-      <button class="secondary-btn" id="btn-manual-entry">Inserisci manualmente</button>
+
+      <form class="manual-barcode-form" id="manual-barcode-form">
+        <label>
+          Codice a barre non leggibile? Inseriscilo a mano
+          <div class="quantity-row">
+            <input type="text" inputmode="numeric" pattern="[0-9]*" id="field-manual-barcode" placeholder="es. 8001120716070">
+            <button type="submit" class="secondary-btn">Cerca</button>
+          </div>
+        </label>
+      </form>
+
+      <button class="secondary-btn" id="btn-manual-entry">Inserisci manualmente (senza barcode)</button>
     </div>
 
     <!-- Add step 2: camera scanning -->

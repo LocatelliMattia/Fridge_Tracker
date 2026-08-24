@@ -157,6 +157,14 @@ function setupAddFlow() {
     pendingBarcode = null;
     showFormStep({});
   });
+  document.getElementById('manual-barcode-form').addEventListener('submit', (event) => {
+    event.preventDefault();
+    const input = document.getElementById('field-manual-barcode');
+    const barcode = input.value.trim();
+    if (!barcode) return;
+    input.value = '';
+    handleBarcodeDetected(barcode);
+  });
   document.getElementById('btn-discard-form').addEventListener('click', resetAddFlow);
   document.getElementById('add-step-form').addEventListener('submit', handleFormSubmit);
 }

@@ -230,6 +230,31 @@ main {
   cursor: pointer;
 }
 
+.manual-barcode-form {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+}
+
+.manual-barcode-form label {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.manual-barcode-form input {
+  -webkit-user-select: text;
+  user-select: text;
+  min-height: var(--tap-min);
+  padding: 0 12px;
+  font-size: 15px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
 #scanner-viewport {
   background: #000;
   border-radius: var(--radius);
