@@ -45,13 +45,12 @@ async function startScanning(onDetected, onError) {
   const config = {
     fps: 10,
     qrbox: { width: 280, height: 180 }, // wide box suits 1D barcodes
-    // Ask for a higher-resolution stream than the library's default —
-    // sharper frames make more difference for barcode decoding than
-    // almost anything else we can control from JS.
+    // Ask for 720p resolution to balance image quality and performance
+    // on lower-end tablet hardware.
     videoConstraints: {
       facingMode: 'environment',
-      width: { ideal: 1920 },
-      height: { ideal: 1080 },
+      width: { ideal: 1280 },
+      height: { ideal: 720 },
     },
   };
 
@@ -71,11 +70,7 @@ async function startScanning(onDetected, onError) {
 
     // Force continuous autofocus where supported. This only works on
     // Android Chrome/Edge via the Image Capture API — iOS Safari does not
-    // expose focus control to web pages at all, so this is a best-effort
-    // improvement, not a guaranteed fix. Devices with a fixed-focus camera
-    // (common on older/cheap tablets) can't be helped by software at all;
-    // the workaround there is finding the lens's fixed focal distance by
-    // moving the device back and forth (usually ~15-25cm).
+    // expose focus control to web pages at all.
     try {
       await scannerInstance.applyVideoConstraints({
         advanced: [{ focusMode: 'continuous' }],

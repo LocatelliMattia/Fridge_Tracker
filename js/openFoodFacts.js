@@ -2,7 +2,7 @@
 // Docs: https://openfoodfacts.github.io/openfoodfacts-server/api/
 // No API key required. We only need read access (product lookup by barcode).
 
-const OFF_BASE_URL = 'https://world.openfoodfacts.org/api/v2/product';
+const OFF_BASE_URL = 'https://it.openfoodfacts.org/api/v2/product'; // 'https://world.openfoodfacts.org/api/v2/product';
 
 // Open Food Facts asks integrators to identify their app via User-Agent,
 // but browsers block setting a custom User-Agent header from JS — this is
