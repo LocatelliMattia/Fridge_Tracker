@@ -73,6 +73,21 @@ function renderList() {
   sorted.forEach((item) => listEl.appendChild(buildItemCard(item)));
 }
 
+async function handleConsumeItem(id) {
+  const item = currentItems.find(i => i.id === id);
+  if (!item) return;
+
+  if (item.quantity <= 1) {
+    // If quantity is 1 or less, delete the item entirely
+    await window.FridgeDB.deleteItem(id);
+  } else {
+    // Otherwise, decrement the quantity and update
+    item.quantity -= 1;
+    await window.FridgeDB.updateItem(item);
+  }
+  await refreshItemsFromDB();
+}
+
 function buildItemCard(item) {
   const status = window.Recommend.freshnessStatus(item);
   const days = window.Recommend.daysUntilExpiry(item);
@@ -87,9 +102,11 @@ function buildItemCard(item) {
   name.className = 'item-card-name';
   name.textContent = item.name;
 
+  // Show quantity and brand/category
   const meta = document.createElement('p');
   meta.className = 'item-card-meta';
-  meta.textContent = [item.brand, item.category].filter(Boolean).join(' · ') || '—';
+  const qtyDisplay = `${item.quantity} ${item.unit || 'pz'}`;
+  meta.textContent = [qtyDisplay, item.brand, item.category].filter(Boolean).join(' · ');
 
   main.appendChild(name);
   main.appendChild(meta);
@@ -98,15 +115,15 @@ function buildItemCard(item) {
   expiry.className = `item-card-expiry status-${status}`;
   expiry.textContent = formatExpiryLabel(days);
 
-  const deleteBtn = document.createElement('button');
-  deleteBtn.className = 'item-card-delete';
-  deleteBtn.setAttribute('aria-label', `Rimuovi ${item.name}`);
-  deleteBtn.textContent = '×';
-  deleteBtn.addEventListener('click', () => handleDeleteItem(item.id));
+  // New "Consume" button
+  const consumeBtn = document.createElement('button');
+  consumeBtn.className = 'item-card-consume';
+  consumeBtn.textContent = '-1';
+  consumeBtn.addEventListener('click', () => handleConsumeItem(item.id));
 
   li.appendChild(main);
   li.appendChild(expiry);
-  li.appendChild(deleteBtn);
+  li.appendChild(consumeBtn);
 
   return li;
 }
@@ -307,11 +324,16 @@ async function handleFormSubmit(event) {
   switchView('list');
 }
 
+
 function numberOrNull(fieldId) {
-  const el = document.getElementById(fieldId).value;
+  const el = document.getElementById(fieldId);
   if (!el) return null;
-  const n = Number(el.value);
-  return Number.isFinite(n) ? n : null;
+  
+  const rawValue = el.value.replace(',', '.'); // Convert comma to dot just in case
+  if (rawValue === '') return null;
+  
+  const n = parseFloat(rawValue); // Use parseFloat instead of Number for better decimal handling
+  return !isNaN(n) && isFinite(n) ? n : null;
 }
 
 function resetAddFlow() {

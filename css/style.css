@@ -104,6 +104,19 @@ main {
   margin-bottom: 12px;
 }
 
+.item-card-consume {
+  background: #f0f0f0;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 4px 8px;
+  cursor: pointer;
+  margin-left: 10px;
+}
+
+.item-card-consume:hover {
+  background: #e0e0e0;
+}
+
 /* Item list + cards (cards are built in app.js) */
 
 .item-list {
