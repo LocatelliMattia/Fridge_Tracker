@@ -3,7 +3,8 @@
 // be fetched fresh, and if the tablet is offline the add-item flow will
 // simply fall back to manual entry (handled in app.js).
 
-const CACHE_NAME = 'fridge-tracker-shell-v3';
+// sw.js — Caches only the static app shell.
+const CACHE_NAME = 'fridge-tracker-shell-v4';
 
 const SHELL_FILES = [
   './',
@@ -19,10 +20,16 @@ const SHELL_FILES = [
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(SHELL_FILES))
+    caches.open(CACHE_NAME).then((cache) => {
+      // Use addAll, but ensure we don't try to cache non-existent or absolute paths
+      return cache.addAll(SHELL_FILES).catch(err => {
+        console.error('Cache addAll failed', err);
+      });
+    })
   );
   self.skipWaiting();
 });
+// ... rest of sw.js ...
 
 self.addEventListener('activate', (event) => {
   event.waitUntil(

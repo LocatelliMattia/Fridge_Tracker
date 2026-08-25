@@ -77,15 +77,37 @@ async function handleConsumeItem(id) {
   const item = currentItems.find(i => i.id === id);
   if (!item) return;
 
-  if (item.quantity <= 1) {
-    // If quantity is 1 or less, delete the item entirely
-    await window.FridgeDB.deleteItem(id);
-  } else {
-    // Otherwise, decrement the quantity and update
-    item.quantity -= 1;
-    await window.FridgeDB.updateItem(item);
-  }
-  await refreshItemsFromDB();
+  const modal = document.getElementById('consume-modal');
+  const input = document.getElementById('consume-amount');
+  const text = document.getElementById('consume-text');
+  
+  text.textContent = `Quanto consumi di ${item.name}? (${item.unit})`;
+  modal.hidden = false; // Show
+
+  // Use a named function so we can remove listener if needed, 
+  // or just reset the onclick handler clearly
+  document.getElementById('btn-consume-ok').onclick = async () => {
+    const amount = parseFloat(input.value.replace(',', '.'));
+    
+    // Hide first
+    modal.hidden = true;
+    input.value = '1'; // Reset
+    
+    if (isNaN(amount) || amount <= 0) return;
+    
+    if (item.quantity <= amount) {
+      await window.FridgeDB.deleteItem(id);
+    } else {
+      item.quantity -= amount;
+      await window.FridgeDB.updateItem(item);
+    }
+    await refreshItemsFromDB();
+  };
+
+  document.getElementById('btn-consume-cancel').onclick = () => {
+    modal.hidden = true;
+    input.value = '1';
+  };
 }
 
 function buildItemCard(item) {
@@ -115,10 +137,10 @@ function buildItemCard(item) {
   expiry.className = `item-card-expiry status-${status}`;
   expiry.textContent = formatExpiryLabel(days);
 
-  // New "Consume" button
+  // Update button text to "Consuma" instead of "-1"
   const consumeBtn = document.createElement('button');
   consumeBtn.className = 'item-card-consume';
-  consumeBtn.textContent = '-1';
+  consumeBtn.textContent = 'Consuma'; // Changed from '-1'
   consumeBtn.addEventListener('click', () => handleConsumeItem(item.id));
 
   li.appendChild(main);
@@ -323,7 +345,6 @@ async function handleFormSubmit(event) {
   resetAddFlow();
   switchView('list');
 }
-
 
 function numberOrNull(fieldId) {
   const el = document.getElementById(fieldId);
