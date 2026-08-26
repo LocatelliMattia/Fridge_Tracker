@@ -177,6 +177,16 @@ details {
   background: #e0e0e0;
 }
 
+.item-card-edit {
+  margin-left: 5px;
+  padding: 8px 12px;
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  cursor: pointer;
+  z-index: 10;
+}
+
 .item-card.status-soon { border-left-color: var(--status-soon); }
 .item-card.status-urgent { border-left-color: var(--status-urgent); }
 .item-card.status-expired { border-left-color: var(--status-expired); }

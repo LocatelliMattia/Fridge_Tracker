@@ -6,6 +6,7 @@
 let currentItems = [];       // in-memory cache, kept in sync with IndexedDB
 let activeMeal = 'breakfast';
 let pendingBarcode = null;   // barcode of the item currently being added, if any
+let editingId = null;        // ID of the item currently being edited, or null if creating new
 
 // ---- Bootstrapping ---------------------------------------------------
 
@@ -213,12 +214,18 @@ function buildItemCard(item) {
   // Update button text to "Consuma" instead of "-1"
   const consumeBtn = document.createElement('button');
   consumeBtn.className = 'item-card-consume';
-  consumeBtn.textContent = 'Consuma'; // Changed from '-1'
+  consumeBtn.textContent = 'Consuma';
   consumeBtn.addEventListener('click', () => handleConsumeItem(item.id));
+
+  const editBtn = document.createElement('button');
+  editBtn.className = 'item-card-edit';
+  editBtn.textContent = 'Modifica';
+  editBtn.addEventListener('click', () => handleEditItem(item.id));
 
   li.appendChild(main);
   li.appendChild(expiry);
   li.appendChild(consumeBtn);
+  li.appendChild(editBtn);
 
   return li;
 }
@@ -233,6 +240,21 @@ function formatExpiryLabel(days) {
 async function handleDeleteItem(id) {
   await window.FridgeDB.deleteItem(id);
   await refreshItemsFromDB();
+}
+
+function handleEditItem(id) {
+  const item = currentItems.find(i => i.id === id);
+  if (!item) return;
+
+  editingId = id;
+  pendingBarcode = item.barcode || null;
+  
+  // Switch to add view and populate form
+  switchView('add');
+  showFormStep({ product: item });
+  
+  // Custom status text for edit mode
+  document.getElementById('form-status').textContent = `Stai modificando: ${item.name}`;
 }
 
 // ---- "Cosa mangio" suggestions ---------------------------------------
@@ -386,8 +408,23 @@ function showFormStep({ product = null, statusText = '', loading = false } = {})
       select.value = '';
     }
     
-    // Set default expiry date
-    document.getElementById('field-expiry').value = defaultExpiryDate();
+    // Set expiry date (either existing item's expiry or default)
+    document.getElementById('field-expiry').value = product.expiryDate || defaultExpiryDate();
+
+    // Set quantity and unit if available
+    if (product.quantity !== undefined) {
+      document.getElementById('field-quantity').value = product.quantity;
+    }
+    if (product.unit) {
+      document.getElementById('field-unit').value = product.unit;
+    }
+
+    // Set meal tags if available
+    if (product.mealTags && Array.isArray(product.mealTags)) {
+      document.querySelectorAll('input[name="mealTag"]').forEach(cb => {
+        cb.checked = product.mealTags.includes(cb.value);
+      });
+    }
 
     // Fill nutrition if available
     if (product.nutriments) {
@@ -452,10 +489,17 @@ async function handleFormSubmit(event) {
     quantity: Number(document.getElementById('field-quantity').value) || 1,
     unit: document.getElementById('field-unit').value,
     expiryDate: document.getElementById('field-expiry').value,
-    addedAt: new Date().toISOString(),
+    addedAt: editingId ? (currentItems.find(i => i.id === editingId).addedAt) : new Date().toISOString(),
   };
 
-  await window.FridgeDB.addItem(item);
+  if (editingId) {
+    item.id = editingId;
+    await window.FridgeDB.updateItem(item);
+  } else {
+    item.barcode = pendingBarcode;
+    await window.FridgeDB.addItem(item);
+  }
+  
   await refreshItemsFromDB();
   resetAddFlow();
   switchView('list');
@@ -474,6 +518,7 @@ function numberOrNull(fieldId) {
 
 function resetAddFlow() {
   pendingBarcode = null;
+  editingId = null; // Reset editing state
   document.getElementById('add-step-form').reset();
   showAddStep('add-step-choice');
 }
