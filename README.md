@@ -1,4 +1,4 @@
-# 🥗 Fridge Tracker 🧊
+# Fridge Tracker 
 *The smart way to manage your kitchen inventory.*
 
 Fridge Tracker is a lightweight, offline-first PWA designed to run on a dedicated kitchen device. It helps you keep track of what's in your fridge, monitors expiration dates, and suggests meals to minimize food waste.
