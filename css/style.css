@@ -1,21 +1,3 @@
-/* ===========================================================================
-   Frigo Tracker — foglio di stile
-   ---------------------------------------------------------------------------
-   Rimpiazza integralmente css/style.css. Plain CSS, nessun build step.
-   Usa esclusivamente le classi già emesse da js/app.js, quindi non serve
-   toccare il markup.
-
-   Direzione visiva: "etichetta a scadenza".
-   Superfici fredde da interno frigo, inchiostro scuro, un solo verde di
-   marca. Il monospace e' riservato a date/quantita' (leggono come timbro
-   stampato), mai al testo corrente. L'urgenza e' l'unico colore saturo
-   dell'interfaccia: e' il dato che conta.
-
-   Nell'<head> serve questo al posto del link font attuale:
-   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Space+Mono:wght@400;700&display=swap">
-   =========================================================================== */
-
 /* ---------------------------------------------------------------------------
    1. Token
    ------------------------------------------------------------------------ */
@@ -89,7 +71,7 @@
   --shadow-raised: 0 8px 24px -6px rgba(0, 0, 0, 0.6);
 }
 
-@media (prefers-color-scheme: dark) {
+@media (prefers-color-scheme: light) {
   :root:not([data-theme="light"]) {
     --bg: #101512;
     --surface: #171e1a;
