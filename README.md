@@ -3,6 +3,8 @@
 
 Fridge Tracker is a lightweight, offline-first PWA designed to run on a dedicated kitchen device. It helps you keep track of what's in your fridge, monitors expiration dates, and suggests meals to minimize food waste.
 
+https://locatellimattia.github.io/Fridge_Tracker/
+
 ---
 
 ### 🚀 Development Status
@@ -21,7 +23,7 @@ We are currently in **Phase 2: Daily Use Enhancements**.
 
 ### 📖 How to Use It
 1.  **Add Items**: Go to the **"Aggiungi"** tab. Use your tablet's camera to scan a barcode or enter the product manually.
-2.  **View Inventory**: Check the **"In frigo"** tab to see all your items, sorted automatically by expiration date.
+2.  **View Inventory**: Check the **"Dispensa"** tab to see all your items, sorted automatically by expiration date.
 3.  **Consume**: Tap the **"Consuma"** button on any item card to record how much you've used. If you finish the item, it automatically disappears from your inventory!
 4.  **Meal Ideas**: Check the **"Cosa mangio"** tab for suggestions based on what's in your fridge.
 
