@@ -13,8 +13,8 @@ We are currently in **Phase 2: Daily Use Enhancements**.
 | Phase | Feature | Status |
 | :--- | :--- | :--- |
 | **1** | Field Validation & Kiosk Setup | ✅ Done |
-| **2** | Editing, Consumption & Backup | 🚧 In Progress |
-| **3** | Smart Recommendation Engine | ⏳ Planned |
+| **2** | Editing & Consumption | ✅ Done |
+| **3** | Smart Recommendation Engine | ⏳ Planned  |
 | **4** | OCR Expiry Date Scanning | ⏳ Planned |
 | **5** | Service Worker Robustness | ✅ Done |
 | **6** | Multi-device Sync | ❌ Future |
