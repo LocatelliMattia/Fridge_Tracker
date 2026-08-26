@@ -50,7 +50,7 @@ button, input, select {
 .app-header {
   position: sticky;
   top: 0;
-  z-index: 10;
+  z-index: 1000;
   background: var(--surface);
   border-bottom: 1px solid var(--border);
   padding: 16px 20px 0;
@@ -96,7 +96,7 @@ main {
 .view { display: none; }
 .view.is-active { display: block; }
 
-/* Summary bar on the "in frigo" list */
+/* Summary bar on the "dispensa" list */
 
 .summary-bar {
   font-size: 14px;
@@ -104,22 +104,40 @@ main {
   margin-bottom: 12px;
 }
 
+.list-controls { display: flex; gap: 8px; margin-bottom: 12px; }
+.list-controls input, .list-controls select { padding: 8px; border-radius: 6px; border: 1px solid var(--border); }
+
 .item-card-main {
   flex-grow: 1;
 }
 
-.item-card-consume {
-  margin-left: 10px;
-  padding: 8px 12px;
-  background-color: #f0f0f0;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+.category-summary {
+  padding: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
   cursor: pointer;
-  z-index: 10;
+  list-style: none; /* Rimuove il triangolino di default */
+  font-size: 16px;
+  color: var(--accent-dark);
+  margin-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
 }
 
-.item-card-consume:hover {
-  background: #e0e0e0;
+/* Aggiunge un indicatore personalizzato */
+.category-summary::after {
+  content: '▼';
+  font-size: 12px;
+}
+
+details[open] .category-summary::after {
+  content: '▲';
+}
+
+/* Rimuove padding extra dai tag details */
+details {
+  margin-bottom: 10px;
 }
 
 /* Item list + cards (cards are built in app.js) */
@@ -143,6 +161,20 @@ main {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
+}
+
+.item-card-consume {
+  margin-left: 10px;
+  padding: 8px 12px;
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  cursor: pointer;
+  z-index: 10;
+}
+
+.item-card-consume:hover {
+  background: #e0e0e0;
 }
 
 .item-card.status-soon { border-left-color: var(--status-soon); }
@@ -394,7 +426,7 @@ main {
   display: flex; 
   align-items: center; 
   justify-content: center;
-  z-index: 1000;
+  z-index: 10;
 }
 .modal-content {
   background: var(--surface);

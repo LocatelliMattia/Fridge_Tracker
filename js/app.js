@@ -13,12 +13,59 @@ async function init() {
   setupTabNav();
   setupMealPicker();
   setupAddFlow();
+  setupListControls();
   await refreshItemsFromDB();
   registerServiceWorker();
 }
 
+function updateCategorySelect() {
+  const select = document.getElementById('field-category-select');
+  
+  // 1. Define the static options: empty and "new category"
+  const options = [
+    { value: '', text: '-- Seleziona o crea --' },
+    { value: 'NEW_CATEGORY', text: '+ Crea nuova categoria...' }
+  ];
+  
+  // 2. Total reset of the select element to avoid duplicates
+  select.innerHTML = '';
+  
+  // 3. Add the static options first
+  options.forEach(opt => {
+    const el = document.createElement('option');
+    el.value = opt.value;
+    el.textContent = opt.text;
+    select.appendChild(el);
+  });
+  
+  // 4. Add dynamic options from currentItems
+  const categories = [...new Set(currentItems.map(i => i.category).filter(Boolean))];
+  categories.sort().forEach(cat => {
+    const option = document.createElement('option');
+    option.value = cat;
+    option.textContent = cat;
+    select.appendChild(option);
+  });
+}
+
+// function updateCategoryList() {
+//   const datalist = document.getElementById('category-list');
+//   if (!datalist) return;
+
+//   // Extract unique, non-empty categories from currentItems
+//   const categories = [...new Set(currentItems.map(i => i.category).filter(Boolean))];
+  
+//   datalist.innerHTML = '';
+//   categories.sort().forEach(cat => {
+//     const option = document.createElement('option');
+//     option.value = cat;
+//     datalist.appendChild(option);
+//   });
+// }
+
 async function refreshItemsFromDB() {
   currentItems = await window.FridgeDB.getAllItems();
+  updateCategorySelect();
   renderList();
   renderSuggestions();
 }
@@ -46,31 +93,57 @@ function switchView(viewName) {
   }
 }
 
-// ---- "In frigo" list ---------------------------------------------------
+// ---- "Dispensa" list ---------------------------------------------------
+
+function setupListControls() {
+  document.getElementById('search-input').addEventListener('input', renderList);
+  document.getElementById('sort-select').addEventListener('change', renderList);
+}
 
 function renderList() {
   const listEl = document.getElementById('item-list');
   const emptyEl = document.getElementById('list-empty-state');
-  const summaryEl = document.getElementById('summary-bar');
-
-  const sorted = [...currentItems].sort(
-    (a, b) => window.Recommend.daysUntilExpiry(a) - window.Recommend.daysUntilExpiry(b)
+  
+  // 1. Filter
+  const query = document.getElementById('search-input').value.toLowerCase();
+  let items = currentItems.filter(i => 
+    i.name.toLowerCase().includes(query) || 
+    (i.brand && i.brand.toLowerCase().includes(query))
   );
 
+  // 2. Group by category
+  const groups = items.reduce((acc, item) => {
+    const cat = item.category || 'Senza Categoria';
+    if (!acc[cat]) acc[cat] = [];
+    acc[cat].push(item);
+    return acc;
+  }, {});
+
   listEl.innerHTML = '';
-  emptyEl.hidden = sorted.length > 0;
+  emptyEl.hidden = items.length > 0;
 
-  const expiringSoonCount = sorted.filter((item) => {
-    const status = window.Recommend.freshnessStatus(item);
-    return status === 'urgent' || status === 'soon';
-  }).length;
-
-  summaryEl.textContent = sorted.length === 0
-    ? ''
-    : `${sorted.length} alimenti in frigo` +
-      (expiringSoonCount > 0 ? ` · ${expiringSoonCount} in scadenza a breve` : '');
-
-  sorted.forEach((item) => listEl.appendChild(buildItemCard(item)));
+  // 3. Render Groups with Collapsible details
+  Object.keys(groups).sort().forEach(cat => {
+    const groupLi = document.createElement('li');
+    
+    // Create collapsible section
+    const details = document.createElement('details');
+    details.open = true; // Default to open
+    
+    const summary = document.createElement('summary');
+    summary.innerHTML = `<strong>${cat}</strong> (${groups[cat].length})`;
+    summary.className = 'category-summary';
+    
+    const subList = document.createElement('ul');
+    subList.className = 'item-list';
+    
+    groups[cat].forEach(item => subList.appendChild(buildItemCard(item)));
+    
+    details.appendChild(summary);
+    details.appendChild(subList);
+    groupLi.appendChild(details);
+    listEl.appendChild(groupLi);
+  });
 }
 
 async function handleConsumeItem(id) {
@@ -208,6 +281,11 @@ function setupAddFlow() {
   document.getElementById('add-step-form').addEventListener('submit', handleFormSubmit);
 }
 
+document.getElementById('field-category-select').addEventListener('change', (e) => {
+  const newCatInput = document.getElementById('field-category-new');
+  newCatInput.style.display = (e.target.value === 'NEW_CATEGORY') ? 'block' : 'none';
+});
+
 function showAddStep(stepId) {
   document.querySelectorAll('#view-add .add-step').forEach((el) => {
     el.hidden = el.id !== stepId;
@@ -275,6 +353,10 @@ function showFormStep({ product = null, statusText = '', loading = false } = {})
 
   const form = document.getElementById('add-step-form');
   form.reset();
+  
+  // Reset category UI
+  document.getElementById('field-category-new').style.display = 'none';
+  document.getElementById('field-category-new').value = '';
 
   document.getElementById('form-status').textContent = loading ? 'Searching product...' : statusText;
 
@@ -282,7 +364,27 @@ function showFormStep({ product = null, statusText = '', loading = false } = {})
   if (product) {
     document.getElementById('field-name').value = product.name || '';
     document.getElementById('field-brand').value = product.brand || '';
-    document.getElementById('field-category').value = product.category || '';
+    
+    // Logic to handle category
+    const select = document.getElementById('field-category-select');
+    const newCatInput = document.getElementById('field-category-new');
+    newCatInput.style.display = 'none';
+    
+    if (product.category) {
+      // Check if the category exists in the dropdown options
+      const optionExists = Array.from(select.options).some(o => o.value === product.category);
+      
+      if (optionExists) {
+        select.value = product.category;
+      } else {
+        // If not, trigger the "New" flow
+        select.value = 'NEW_CATEGORY';
+        newCatInput.style.display = 'block';
+        newCatInput.value = product.category;
+      }
+    } else {
+      select.value = '';
+    }
     
     // Set default expiry date
     document.getElementById('field-expiry').value = defaultExpiryDate();
@@ -290,7 +392,6 @@ function showFormStep({ product = null, statusText = '', loading = false } = {})
     // Fill nutrition if available
     if (product.nutriments) {
       const n = product.nutriments;
-      // Use optional chaining and fallback to empty string
       document.getElementById('field-kcal').value = n.energyKcal ?? '';
       document.getElementById('field-proteins').value = n.proteins ?? '';
       document.getElementById('field-carbs').value = n.carbs ?? '';
@@ -318,11 +419,25 @@ async function handleFormSubmit(event) {
     document.querySelectorAll('input[name="mealTag"]:checked')
   ).map((el) => el.value);
 
+  const select = document.getElementById('field-category-select');
+  const newCatInput = document.getElementById('field-category-new');
+  
+  // Logic: 
+  // 1. If select is empty, category is null.
+  // 2. If select is NEW_CATEGORY, take value from text input.
+  // 3. Otherwise, take value from select.
+  let finalCategory = null;
+  if (select.value === 'NEW_CATEGORY') {
+    finalCategory = newCatInput.value.trim();
+  } else if (select.value !== '') {
+    finalCategory = select.value;
+  }
+
   const item = {
     barcode: pendingBarcode,
     name: document.getElementById('field-name').value.trim(),
     brand: document.getElementById('field-brand').value.trim() || null,
-    category: document.getElementById('field-category').value.trim() || null,
+    category: finalCategory || null,
     mealTags,
     nutriscore: null,
     nutriments: {

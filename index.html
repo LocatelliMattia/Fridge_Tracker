@@ -16,7 +16,7 @@
 <header class="app-header">
   <h1 class="app-title">Frigo Tracker</h1>
   <nav class="tab-nav" id="tab-nav">
-    <button class="tab-btn is-active" data-view="list">In frigo</button>
+    <button class="tab-btn is-active" data-view="list">Dispensa</button>
     <button class="tab-btn" data-view="suggest">Cosa mangio</button>
     <button class="tab-btn" data-view="add">Aggiungi</button>
   </nav>
@@ -26,10 +26,21 @@
 
   <!-- VIEW: List of everything currently in the fridge -->
   <section id="view-list" class="view is-active">
+    <div class="list-controls">
+      <input type="text" id="search-input" placeholder="Cerca nella dispensa...">
+      <select id="sort-select">
+        <option value="expiry">Scadenza</option>
+        <option value="name">Nome</option>
+        <option value="field-category">Categoria</option>
+      </select>
+    </div>
+    
+    <div class="summary-bar" id="summary-bar"></div>
+    <ul class="item-list" id="item-list"></ul>
     <div class="summary-bar" id="summary-bar"></div>
     <ul class="item-list" id="item-list"></ul>
     <p class="empty-state" id="list-empty-state" hidden>
-      Il frigo è vuoto. Tocca <strong>Aggiungi</strong> per scansionare il primo alimento.
+      La dispensa è vuota. Tocca <strong>Aggiungi</strong> per scansionare il primo alimento.
     </p>
   </section>
 
@@ -89,8 +100,10 @@
       </label>
 
       <label>
-        Categoria
-        <input type="text" id="field-category">
+        Categoria / Dispensa
+        <select id="field-category-select">
+        </select>
+        <input type="text" id="field-category-new" placeholder="Nome nuova categoria" style="display: none; margin-top: 8px;">
       </label>
 
       <label>
@@ -138,6 +151,18 @@
     </form>
 
   </section>
+  
+  <!-- Modal for consuming an item -->
+  <div id="consume-modal" class="modal" hidden>
+    <div class="modal-content">
+      <p id="consume-text"></p>
+      <input type="number" id="consume-amount" value="1" step="any">
+      <div class="modal-actions">
+        <button id="btn-consume-cancel" class="secondary-btn">Annulla</button>
+        <button id="btn-consume-ok" class="primary-btn">Conferma</button>
+      </div>
+    </div>
+  </div>
 
 </main>
 
@@ -149,18 +174,6 @@
 <script src="js/scanner.js"></script>
 <script src="js/recommend.js"></script>
 <script src="js/app.js"></script>
-
-<!-- Modal for consuming an item -->
-<div id="consume-modal" class="modal" hidden>
-  <div class="modal-content">
-    <p id="consume-text"></p>
-    <input type="number" id="consume-amount" value="1" step="any">
-    <div class="modal-actions">
-      <button id="btn-consume-cancel" class="secondary-btn">Annulla</button>
-      <button id="btn-consume-ok" class="primary-btn">Conferma</button>
-    </div>
-  </div>
-</div>
 
 </body>
 </html>
