@@ -1,470 +1,1269 @@
-/* Design tokens
-   Palette: cool sage/forest, tuned for a kitchen touchscreen rather than
-   a marketing page. Status colors follow the freshness of an item and
-   are functional, not decorative (fresh -> expired reads left to right
-   as a traffic-light gradient). */
+/* ===========================================================================
+   Frigo Tracker — foglio di stile
+   ---------------------------------------------------------------------------
+   Rimpiazza integralmente css/style.css. Plain CSS, nessun build step.
+   Usa esclusivamente le classi già emesse da js/app.js, quindi non serve
+   toccare il markup.
+
+   Direzione visiva: "etichetta a scadenza".
+   Superfici fredde da interno frigo, inchiostro scuro, un solo verde di
+   marca. Il monospace e' riservato a date/quantita' (leggono come timbro
+   stampato), mai al testo corrente. L'urgenza e' l'unico colore saturo
+   dell'interfaccia: e' il dato che conta.
+
+   Nell'<head> serve questo al posto del link font attuale:
+   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Space+Mono:wght@400;700&display=swap">
+   =========================================================================== */
+
+/* ---------------------------------------------------------------------------
+   1. Token
+   ------------------------------------------------------------------------ */
 
 :root {
-  --bg: #F4F6F3;
-  --surface: #FFFFFF;
-  --text-primary: #1F2A24;
-  --text-secondary: #5B6B60;
-  --border: #DCE3DD;
+  /* Neutri: freddi, non crema. Simulano l'interno illuminato di un frigo. */
+  --bg: #edf0ee;
+  --surface: #ffffff;
+  --surface-2: #f6f8f6;
+  --ink: #131a16;
+  --ink-2: #5a6a61;
+  --line: #dee4df;
+  --line-strong: #c6d0c9;
 
-  --accent: #3F7A5C;
-  --accent-dark: #2C5943;
-  --accent-contrast: #FFFFFF;
+  /* Unico colore di marca. */
+  --primary: #2f6b4f;
+  --primary-hover: #245840;
+  --primary-ink: #ffffff;
 
-  --status-fresh: #48b37c;
-  --status-soon: #C98A1F;
-  --status-urgent: #D9722B;
-  --status-expired: #C6493B;
+  /* Rampa di freschezza: una sola progressione verde -> rosso, non quattro
+     colori indipendenti. Semantica, mai decorativa. */
+  --fresh: #3e8e63;
+  --soon: #a97a11;
+  --urgent: #c1571b;
+  --expired: #b3332a;
 
-  --font-display: 'Space Grotesk', system-ui, sans-serif;
-  --font-body: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --fresh-tint: #eef6f1;
+  --soon-tint: #fbf4e4;
+  --urgent-tint: #fdf1e8;
+  --expired-tint: #fdeeec;
 
   --radius: 14px;
+  --radius-sm: 9px;
   --tap-min: 48px;
+
+  --font-display: "Space Grotesk", system-ui, sans-serif;
+  --font-body: "Space Grotesk", system-ui, -apple-system, sans-serif;
+  /* Solo numeri, date, codici a barre. */
+  --font-mono: "Space Mono", ui-monospace, "SF Mono", monospace;
+
+  --shadow-card: 0 1px 2px rgba(19, 26, 22, 0.06), 0 1px 1px rgba(19, 26, 22, 0.04);
+  --shadow-raised: 0 8px 24px -6px rgba(19, 26, 22, 0.18);
 }
 
-* { box-sizing: border-box; }
+/* Tema scuro per l'uso serale in cucina.
+   Attivo con <html data-theme="dark"> oppure via preferenza di sistema. */
+[data-theme="dark"] {
+  --bg: #101512;
+  --surface: #171e1a;
+  --surface-2: #1e2723;
+  --ink: #e8ede9;
+  --ink-2: #93a59a;
+  --line: #29332d;
+  --line-strong: #3a4740;
 
-html, body {
+  --primary: #4e9e75;
+  --primary-hover: #5fb086;
+  --primary-ink: #08110c;
+
+  --fresh: #5cb183;
+  --soon: #d9a441;
+  --urgent: #e5834a;
+  --expired: #e56a5e;
+
+  --fresh-tint: #16241c;
+  --soon-tint: #2a2417;
+  --urgent-tint: #2c211a;
+  --expired-tint: #2d1c1b;
+
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-raised: 0 8px 24px -6px rgba(0, 0, 0, 0.6);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #101512;
+    --surface: #171e1a;
+    --surface-2: #1e2723;
+    --ink: #e8ede9;
+    --ink-2: #93a59a;
+    --line: #29332d;
+    --line-strong: #3a4740;
+
+    --primary: #4e9e75;
+    --primary-hover: #5fb086;
+    --primary-ink: #08110c;
+
+    --fresh: #5cb183;
+    --soon: #d9a441;
+    --urgent: #e5834a;
+    --expired: #e56a5e;
+
+    --fresh-tint: #16241c;
+    --soon-tint: #2a2417;
+    --urgent-tint: #2c211a;
+    --expired-tint: #2d1c1b;
+
+    --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.4);
+    --shadow-raised: 0 8px 24px -6px rgba(0, 0, 0, 0.6);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   2. Reset e base
+   ------------------------------------------------------------------------ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--bg);
+  /* Evita che iOS ingrandisca il testo in landscape sul tablet appeso. */
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
   margin: 0;
   padding: 0;
   background: var(--bg);
-  color: var(--text-primary);
+  color: var(--ink);
   font-family: var(--font-body);
-  /* Kiosk display: no accidental text selection or pull-to-refresh */
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  /* Kiosk: niente selezione accidentale ne' pull-to-refresh. */
   -webkit-user-select: none;
   user-select: none;
   overscroll-behavior-y: contain;
+  /* Spazio per la tab bar fissa in basso su mobile. */
+  padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px));
 }
 
-button, input, select {
+button,
+input,
+select,
+textarea {
   font-family: inherit;
+  font-size: inherit;
+  color: inherit;
 }
 
-/* Header + tab navigation */
+/* Un solo stile di focus per tutta l'app, sempre visibile.
+   Su un touchscreen conta soprattutto per la tastiera bluetooth. */
+:where(button, input, select, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   3. Header e navigazione
+   ------------------------------------------------------------------------ */
 
 .app-header {
   position: sticky;
   top: 0;
-  z-index: 1000;
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
-  padding: 16px 20px 0;
+  z-index: 900;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 18px;
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  backdrop-filter: saturate(1.4) blur(10px);
+  border-bottom: 1px solid var(--line);
 }
 
 .app-title {
+  margin: 0;
   font-family: var(--font-display);
   font-weight: 700;
-  font-size: 22px;
-  margin: 0 0 12px;
+  font-size: 19px;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
 }
 
+/* Il titolo porta un piccolo indicatore di stato, come la spia di un
+   elettrodomestico. Puro CSS, nessun markup aggiuntivo. */
+.app-title::before {
+  content: "";
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-right: 9px;
+  border-radius: 50%;
+  background: var(--fresh);
+  vertical-align: 0.1em;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--fresh) 18%, transparent);
+}
+
+/* Mobile: la navigazione scende in basso, raggiungibile col pollice. */
 .tab-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 950;
   display: flex;
-  gap: 4px;
+  gap: 2px;
+  padding: 6px 8px calc(6px + env(safe-area-inset-bottom, 0px));
+  background: color-mix(in srgb, var(--surface) 94%, transparent);
+  backdrop-filter: blur(12px);
+  border-top: 1px solid var(--line);
 }
 
 .tab-btn {
   flex: 1;
   min-height: var(--tap-min);
+  padding: 8px 6px;
   border: none;
+  border-radius: var(--radius-sm);
   background: transparent;
-  color: var(--text-secondary);
-  font-size: 15px;
-  font-weight: 500;
-  border-bottom: 3px solid transparent;
+  color: var(--ink-2);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: -0.01em;
   cursor: pointer;
+  transition: background 0.16s ease, color 0.16s ease;
+}
+
+.tab-btn:hover {
+  color: var(--ink);
 }
 
 .tab-btn.is-active {
-  color: var(--accent-dark);
-  border-bottom-color: var(--accent);
+  background: var(--primary);
+  color: var(--primary-ink);
 }
 
-/* View switching */
+/* Tablet e oltre: navigazione in linea nell'header. */
+@media (min-width: 700px) {
+  body {
+    padding-bottom: 0;
+  }
+
+  .tab-nav {
+    position: static;
+    padding: 0;
+    margin-left: auto;
+    background: var(--surface-2);
+    backdrop-filter: none;
+    border: 1px solid var(--line);
+    border-radius: calc(var(--radius-sm) + 4px);
+    gap: 3px;
+  }
+
+  .tab-nav {
+    padding: 3px;
+  }
+
+  .tab-btn {
+    flex: 0 0 auto;
+    min-height: 42px;
+    padding: 0 18px;
+    font-size: 14px;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   4. Contenitore delle viste
+   ------------------------------------------------------------------------ */
 
 main {
-  max-width: 640px;
+  display: block;
+  width: 100%;
+  max-width: 1180px;
   margin: 0 auto;
-  padding: 16px 16px 80px;
+  padding: 18px;
 }
 
-.view { display: none; }
-.view.is-active { display: block; }
+.view {
+  display: none;
+}
 
-/* Summary bar on the "dispensa" list */
+.view.is-active {
+  display: block;
+  animation: view-in 0.22s ease both;
+}
+
+@keyframes view-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   5. Controlli della lista
+   ------------------------------------------------------------------------ */
+
+.list-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.list-controls input[type="text"] {
+  flex: 1 1 220px;
+  min-height: var(--tap-min);
+  padding: 0 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  transition: border-color 0.16s ease;
+}
+
+.list-controls input[type="text"]::placeholder {
+  color: var(--ink-2);
+}
+
+.list-controls input[type="text"]:focus {
+  border-color: var(--primary);
+}
+
+.list-controls select {
+  flex: 0 0 auto;
+  min-height: var(--tap-min);
+  padding: 0 38px 0 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background-color: var(--surface);
+  /* Freccia disegnata come data-URI: nessuna richiesta extra, offline safe. */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5 6 6.5l5-5' fill='none' stroke='%235a6a61' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+/* ---------------------------------------------------------------------------
+   6. Barra di riepilogo
+   ------------------------------------------------------------------------ */
 
 .summary-bar {
-  font-size: 14px;
-  color: var(--text-secondary);
-  margin-bottom: 12px;
-}
-
-.list-controls { display: flex; gap: 8px; margin-bottom: 12px; }
-.list-controls input, .list-controls select { padding: 8px; border-radius: 6px; border: 1px solid var(--border); }
-
-.item-card-main {
-  flex-grow: 1;
-}
-
-.category-summary {
-  padding: 12px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  cursor: pointer;
-  list-style: none; /* Rimuove il triangolino di default */
-  font-size: 16px;
-  color: var(--accent-dark);
-  margin-bottom: 8px;
   display: flex;
-  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  margin-bottom: 16px;
+  padding: 13px 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow-card);
+  color: var(--ink-2);
+  font-size: 14px;
 }
 
-/* Aggiunge un indicatore personalizzato */
-.category-summary::after {
-  content: '▼';
-  font-size: 12px;
+.summary-bar:empty {
+  display: none;
 }
 
-details[open] .category-summary::after {
-  content: '▲';
+.summary-bar strong {
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-weight: 700;
 }
 
-/* Rimuove padding extra dai tag details */
-details {
-  margin-bottom: 10px;
-}
-
-/* Item list + cards (cards are built in app.js) */
+/* ---------------------------------------------------------------------------
+   7. Gruppi per categoria
+   ------------------------------------------------------------------------ */
 
 .item-list {
   list-style: none;
   margin: 0;
   padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
 }
 
-.item-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-left: 6px solid var(--status-fresh);
-  border-radius: var(--radius);
-  padding: 14px 16px;
+/* La lista annidata dentro una categoria: griglia di card.
+   .is-flat e' la stessa griglia senza raggruppamento, usata quando si
+   ordina per scadenza. */
+.item-list .item-list,
+.item-list.is-flat {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+  padding: 4px 0 20px;
+}
+
+@media (min-width: 760px) {
+  .item-list .item-list,
+  .item-list.is-flat {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1080px) {
+  .item-list .item-list,
+  .item-list.is-flat {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.category-summary {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 12px;
+  gap: 10px;
+  min-height: var(--tap-min);
+  padding: 6px 4px;
+  border-bottom: 1px solid var(--line);
+  color: var(--ink-2);
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  cursor: pointer;
+  list-style: none;
+}
+
+.category-summary::-webkit-details-marker {
+  display: none;
+}
+
+/* Triangolo di apertura, ruota con lo stato del <details>. */
+.category-summary::before {
+  content: "";
+  width: 0;
+  height: 0;
+  border-left: 5px solid currentColor;
+  border-top: 4px solid transparent;
+  border-bottom: 4px solid transparent;
+  transition: transform 0.18s ease;
+}
+
+details[open] > .category-summary::before {
+  transform: rotate(90deg);
+}
+
+.category-summary strong {
+  color: var(--ink);
+  letter-spacing: 0.04em;
+}
+
+/* Bersaglio di drop durante il drag di una card tra categorie. */
+.item-list.drop-target {
+  outline: 2px dashed var(--primary);
+  outline-offset: 4px;
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--primary) 6%, transparent);
+}
+
+/* ---------------------------------------------------------------------------
+   8. Card alimento — il cuore dell'interfaccia
+   ------------------------------------------------------------------------ */
+
+.item-card {
+  position: relative;
+  display: grid;
+  /* Colonna 1 = azioni affiancate, colonna 2 = timbro, colonna 3 = respiro.
+     Cosi' "Consuma" e "Modifica" restano vicini invece di allontanarsi ai
+     due lati della card. */
+  grid-template-columns: auto auto minmax(0, 1fr) auto;
+  grid-template-areas:
+    "main    main main    expiry"
+    "consume edit .       .";
+  align-content: space-between;
+  align-items: start;
+  /* Altezza uniforme in griglia: le card di una riga si allineano. */
+  height: 100%;
+  gap: 14px 8px;
+  /* Padding sinistro maggiorato: lascia spazio al misuratore verticale. */
+  padding: 14px 14px 14px 20px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+  cursor: grab;
+  transition: box-shadow 0.16s ease, transform 0.16s ease, border-color 0.16s ease;
+}
+
+.item-card:hover {
+  border-color: var(--line-strong);
+  box-shadow: var(--shadow-raised);
+}
+
+.item-card.is-dragging {
+  opacity: 0.5;
+  transform: scale(0.98) rotate(-0.6deg);
+  cursor: grabbing;
+}
+
+/* Ogni stato di freschezza definisce un solo colore, riusato dalla barra,
+   dal timbro e dal bordo. Un colore, tre usi: resta coerente. */
+.item-card.status-fresh {
+  --status: var(--fresh);
+  --status-tint: var(--fresh-tint);
+}
+.item-card.status-soon {
+  --status: var(--soon);
+  --status-tint: var(--soon-tint);
+}
+.item-card.status-urgent {
+  --status: var(--urgent);
+  --status-tint: var(--urgent-tint);
+}
+.item-card.status-expired {
+  --status: var(--expired);
+  --status-tint: var(--expired-tint);
+}
+
+/* Gli alimenti scaduti smettono di essere "prodotti" e diventano un
+   problema da smaltire: la card si tinge. */
+.item-card.status-expired {
+  background: var(--expired-tint);
+  border-color: color-mix(in srgb, var(--expired) 32%, transparent);
+}
+
+/* ELEMENTO FIRMA — misuratore di freschezza.
+   Barra verticale sul bordo sinistro: il binario e' la vita totale
+   dell'alimento, il riempimento (dal basso) e' quanta ne resta. Si svuota
+   avvicinandosi alla scadenza, come il livello di un serbatoio.
+   Senza JS aggiuntivo resta pieno e vale come banda di stato; impostando
+   --freshness sulla card diventa un vero indicatore (vedi nota a fondo file). */
+.item-card::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 6px;
+  /* Binario ben visibile: e' la scala su cui si legge il riempimento.
+     Se e' troppo tenue, una barra quasi vuota sembra un errore grafico
+     invece di "sta per scadere". */
+  background: color-mix(in srgb, var(--status) 30%, var(--surface-2));
+}
+
+.item-card::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 6px;
+  height: var(--freshness, 100%);
+  background: var(--status);
+  transition: height 0.4s ease;
+}
+
+.item-card-main {
+  grid-area: main;
+  min-width: 0;
+}
+
+.item-card-name {
+  margin: 0 0 3px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 17px;
+  line-height: 1.25;
+  letter-spacing: -0.015em;
+  /* Va a capo: i nomi da Open Food Facts sono spesso lunghissimi. */
+  overflow-wrap: anywhere;
+}
+
+/* Nessun barrato sugli scaduti: il barrato comunica "fatto, archiviato",
+   mentre uno scaduto e' esattamente l'alimento che richiede ancora
+   un'azione. L'urgenza la portano il timbro, il misuratore e il fondo
+   della card. */
+
+.item-card-meta {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 13px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+/* Il timbro di scadenza: mono, incorniciato, come una data stampata
+   sulla confezione. E' l'elemento dominante della card — occupa l'intera
+   altezza sulla destra e i giorni si leggono da lontano. */
+.item-card-expiry {
+  grid-area: expiry;
+  align-self: start;
+  justify-self: end;
+  max-width: 88px;
+  padding: 5px 9px;
+  border: 1px solid color-mix(in srgb, var(--status) 35%, transparent);
+  border-radius: 7px;
+  background: var(--status-tint);
+  color: var(--status);
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 11.5px;
+  line-height: 1.3;
+  letter-spacing: -0.03em;
+  text-align: right;
+  /* Va a capo tra "Scade tra" e "12g": i giorni finiscono su una riga sola. */
+  text-wrap: balance;
+}
+
+/* Scaduto e in scadenza oggi/domani: timbro pieno, massimo contrasto. */
+.item-card.status-expired .item-card-expiry,
+.item-card.status-urgent .item-card-expiry {
+  background: var(--status);
+  border-color: var(--status);
+  color: var(--surface);
+}
+
+[data-theme="dark"] .item-card.status-expired .item-card-expiry,
+[data-theme="dark"] .item-card.status-urgent .item-card-expiry {
+  color: #0d120f;
+}
+
+/* Le azioni sono ripetute su ogni card: se fossero piene di colore
+   diventerebbero il motivo dominante della griglia e soffocherebbero il
+   timbro di scadenza. Restano quindi in ombra e si accendono all'hover. */
+.item-card-consume,
+.item-card-edit {
+  min-height: 40px;
+  padding: 0 14px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  color: var(--ink-2);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.16s ease, border-color 0.16s ease, color 0.16s ease;
 }
 
 .item-card-consume {
-  margin-left: 10px;
-  padding: 8px 12px;
-  background-color: #f0f0f0;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  cursor: pointer;
-  z-index: 10;
+  grid-area: consume;
+  justify-self: start;
 }
 
+/* Consuma e' l'azione principale, ma si dichiara solo al tocco. */
 .item-card-consume:hover {
-  background: #e0e0e0;
+  border-color: var(--primary);
+  background: var(--primary);
+  color: var(--primary-ink);
 }
 
 .item-card-edit {
-  margin-left: 5px;
-  padding: 8px 12px;
-  background-color: #f0f0f0;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  cursor: pointer;
-  z-index: 10;
+  grid-area: edit;
+  justify-self: start;
 }
 
-.item-card.status-soon { border-left-color: var(--status-soon); }
-.item-card.status-urgent { border-left-color: var(--status-urgent); }
-.item-card.status-expired { border-left-color: var(--status-expired); }
-
-.item-card-main { min-width: 0; }
-
-.item-card-name {
-  font-weight: 500;
-  font-size: 16px;
-  margin: 0 0 2px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+.item-card-edit:hover {
+  border-color: var(--line-strong);
+  color: var(--ink);
 }
 
-.item-card-meta {
-  font-size: 13px;
-  color: var(--text-secondary);
-  margin: 0;
+/* Touch: senza hover l'affordance deve essere visibile subito, quindi su
+   dispositivi a puntatore grosso Consuma prende un contorno stabile. */
+@media (hover: none) {
+  .item-card-consume {
+    border-color: color-mix(in srgb, var(--primary) 45%, transparent);
+    color: var(--primary);
+  }
 }
 
-.item-card-expiry {
-  font-size: 13px;
-  font-weight: 500;
-  white-space: nowrap;
-}
-
-.item-card-expiry.status-fresh { color: var(--status-fresh); }
-.item-card-expiry.status-soon { color: var(--status-soon); }
-.item-card-expiry.status-urgent { color: var(--status-urgent); }
-.item-card-expiry.status-expired { color: var(--status-expired); }
-
-.item-card-delete {
-  border: none;
-  background: transparent;
-  color: var(--text-secondary);
-  font-size: 20px;
-  line-height: 1;
-  cursor: pointer;
-  min-width: var(--tap-min);
-  min-height: var(--tap-min);
-}
+/* ---------------------------------------------------------------------------
+   9. Stato vuoto
+   ------------------------------------------------------------------------ */
 
 .empty-state {
-  text-align: center;
-  color: var(--text-secondary);
-  padding: 40px 20px;
+  margin: 8px 0;
+  padding: 40px 24px;
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--radius);
+  background: var(--surface-2);
+  color: var(--ink-2);
   font-size: 15px;
+  line-height: 1.6;
+  text-align: center;
+  text-wrap: pretty;
 }
 
-/* Meal picker (suggestion view) */
+.empty-state strong {
+  color: var(--ink);
+}
+
+/* ---------------------------------------------------------------------------
+   10. Selettore pasto
+   ------------------------------------------------------------------------ */
 
 .meal-picker {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 8px;
-  margin-bottom: 16px;
+  margin-bottom: 18px;
+}
+
+@media (min-width: 600px) {
+  .meal-picker {
+    /* Colonne a contenuto invece che 1fr: su tablet e desktop quattro
+       bottoni stirati per tutta la larghezza peserebbero piu' dei
+       suggerimenti che servono a filtrare. */
+    grid-template-columns: repeat(4, minmax(120px, max-content));
+    justify-content: start;
+  }
 }
 
 .meal-btn {
-  min-height: var(--tap-min);
-  border: 1px solid var(--border);
+  min-height: 54px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
   background: var(--surface);
-  border-radius: var(--radius);
+  color: var(--ink-2);
+  font-family: var(--font-display);
+  font-weight: 600;
   font-size: 15px;
-  font-weight: 500;
-  color: var(--text-primary);
   cursor: pointer;
+  transition: background 0.16s ease, color 0.16s ease, border-color 0.16s ease;
+}
+
+.meal-btn:hover {
+  border-color: var(--line-strong);
+  color: var(--ink);
 }
 
 .meal-btn.is-active {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: var(--accent-contrast);
+  border-color: var(--primary);
+  background: var(--primary);
+  color: var(--primary-ink);
 }
 
-/* Add-item flow */
-
-.add-step { display: flex; flex-direction: column; gap: 12px; }
-
-.primary-btn {
-  min-height: 56px;
-  background: var(--accent);
-  color: var(--accent-contrast);
-  border: none;
-  border-radius: var(--radius);
-  font-size: 16px;
-  font-weight: 500;
-  cursor: pointer;
+/* Nella vista suggerimenti la lista e' piatta, non annidata. */
+#suggest-list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
 }
 
-.primary-btn:active { background: var(--accent-dark); }
+@media (min-width: 760px) {
+  #suggest-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
 
+@media (min-width: 1080px) {
+  #suggest-list {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   11. Flusso di aggiunta
+   ------------------------------------------------------------------------ */
+
+.add-step {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-width: 660px;
+}
+
+.primary-btn,
 .secondary-btn {
   min-height: var(--tap-min);
-  background: var(--surface);
-  color: var(--text-primary);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
+  padding: 12px 22px;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-display);
+  font-weight: 600;
   font-size: 15px;
   cursor: pointer;
+  transition: background 0.16s ease, border-color 0.16s ease, color 0.16s ease;
+}
+
+.primary-btn {
+  border: 1px solid var(--primary);
+  background: var(--primary);
+  color: var(--primary-ink);
+}
+
+.primary-btn:hover {
+  background: var(--primary-hover);
+  border-color: var(--primary-hover);
+}
+
+.secondary-btn {
+  border: 1px solid var(--line-strong);
+  background: var(--surface);
+  color: var(--ink);
+}
+
+.secondary-btn:hover {
+  border-color: var(--ink-2);
+}
+
+/* Lo scan e' l'azione primaria del flusso: piu' alta e con un'icona. */
+#btn-start-scan {
+  min-height: 66px;
+  font-size: 17px;
+}
+
+#btn-start-scan::before {
+  content: "";
+  display: inline-block;
+  width: 20px;
+  height: 16px;
+  margin-right: 12px;
+  vertical-align: -2px;
+  /* Codice a barre stilizzato, disegnato con un gradiente a bande. */
+  background: repeating-linear-gradient(
+    to right,
+    currentColor 0 2px,
+    transparent 2px 4px,
+    currentColor 4px 5px,
+    transparent 5px 8px
+  );
 }
 
 .manual-barcode-form {
-  background: var(--surface);
-  border: 1px solid var(--border);
+  padding: 16px;
+  border: 1px solid var(--line);
   border-radius: var(--radius);
-  padding: 14px 16px;
-}
-
-.manual-barcode-form label {
-  display: block;
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--text-secondary);
-}
-
-.manual-barcode-form input {
-  -webkit-user-select: text;
-  user-select: text;
-  min-height: var(--tap-min);
-  padding: 0 12px;
-  font-size: 15px;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-}
-
-#scanner-viewport {
-  background: #000;
-  border-radius: var(--radius);
-  overflow: hidden;
-  min-height: 260px;
+  background: var(--surface-2);
 }
 
 .hint-text {
-  text-align: center;
-  color: var(--text-secondary);
-  font-size: 14px;
   margin: 0;
+  color: var(--ink-2);
+  font-size: 14px;
+  text-wrap: pretty;
 }
 
-/* Item form */
-
-.item-form {
-  background: var(--surface);
-  border: 1px solid var(--border);
+#scanner-viewport {
+  overflow: hidden;
+  border: 1px solid var(--line-strong);
   border-radius: var(--radius);
-  padding: 18px;
+  background: #0b0f0d;
+  aspect-ratio: 4 / 3;
 }
 
-.item-form label {
-  display: block;
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--text-secondary);
-  margin-bottom: 14px;
-}
-
-.item-form input,
-.item-form select {
-  -webkit-user-select: text;
-  user-select: text;
+#scanner-viewport video {
   display: block;
   width: 100%;
-  min-height: var(--tap-min);
-  margin-top: 4px;
-  padding: 0 12px;
-  font-size: 15px;
-  color: var(--text-primary);
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 8px;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ---------------------------------------------------------------------------
+   12. Form alimento
+   ------------------------------------------------------------------------ */
+
+.item-form {
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow-card);
+}
+
+/* Su tablet il form va a due colonne: dimezza lo scroll. */
+@media (min-width: 720px) {
+  .add-step.item-form {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px 18px;
+    max-width: 860px;
+  }
+
+  .item-form > .form-status,
+  .item-form > .meal-tags-field,
+  .item-form > .nutrition-details,
+  .item-form > .form-actions {
+    grid-column: 1 / -1;
+  }
 }
 
 .form-status {
-  font-size: 13px;
-  color: var(--accent-dark);
-  min-height: 18px;
+  margin: 0;
+  padding: 11px 14px;
+  border-left: 3px solid var(--primary);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  background: var(--fresh-tint);
+  color: var(--ink);
+  font-size: 14px;
+  text-wrap: pretty;
+}
+
+.form-status:empty {
+  display: none;
+}
+
+/* Ogni <label> e' un blocco etichetta + campo. */
+.item-form > label,
+.nutrition-grid label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  color: var(--ink-2);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.item-form input[type="text"],
+.item-form input[type="number"],
+.item-form input[type="date"],
+.item-form select {
+  width: 100%;
+  min-height: var(--tap-min);
+  padding: 0 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: normal;
+  text-transform: none;
+  transition: border-color 0.16s ease;
+}
+
+.item-form input:focus,
+.item-form select:focus {
+  border-color: var(--primary);
+}
+
+/* Numeri e date in mono: sono dati, non prosa. */
+.item-form input[type="number"],
+.item-form input[type="date"] {
+  font-family: var(--font-mono);
+  font-weight: 700;
+}
+
+/* La data di scadenza e' il campo che determina tutta l'app: si vede. */
+#field-expiry {
+  font-size: 18px;
+  border-color: var(--line-strong);
+}
+
+.item-form select {
+  padding-right: 38px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5 6 6.5l5-5' fill='none' stroke='%235a6a61' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-size: 12px;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
 }
 
 .quantity-row {
-  display: grid;
-  grid-template-columns: 2fr 1fr;
+  display: flex;
   gap: 8px;
 }
 
+.quantity-row input {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.quantity-row select,
+.quantity-row .secondary-btn {
+  flex: 0 0 auto;
+  width: auto;
+  min-width: 92px;
+}
+
+/* Tag pasto: da checkbox native minuscole a pillole toccabili. */
 .meal-tags-field {
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 10px 12px;
-  margin-bottom: 14px;
+  margin: 0;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface-2);
 }
 
 .meal-tags-field legend {
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--text-secondary);
-  padding: 0 4px;
+  padding: 0 6px;
+  color: var(--ink-2);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.meal-tags-field {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.meal-tags-field legend {
+  grid-column: 1 / -1;
+}
+
+@media (min-width: 600px) {
+  .meal-tags-field {
+    grid-template-columns: repeat(4, 1fr);
+  }
 }
 
 .checkbox-label {
-  display: flex !important;
+  display: flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
-  font-weight: 400 !important;
-  color: var(--text-primary) !important;
-  min-height: 40px;
-}
-
-.checkbox-label input { width: auto; min-height: auto; }
-
-.nutrition-details {
-  margin-bottom: 14px;
-  font-size: 13px;
-  color: var(--text-secondary);
-}
-
-.nutrition-details summary {
+  min-height: var(--tap-min);
+  padding: 0 10px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--ink-2);
+  font-size: 14px;
+  font-weight: 600;
   cursor: pointer;
-  font-weight: 500;
-  padding: 8px 0;
+  transition: background 0.16s ease, border-color 0.16s ease, color 0.16s ease;
+}
+
+.checkbox-label:hover {
+  border-color: var(--ink-2);
+}
+
+/* La pillola si accende quando la checkbox interna e' selezionata. */
+.checkbox-label:has(input:checked) {
+  border-color: var(--primary);
+  background: var(--fresh-tint);
+  color: var(--primary);
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  accent-color: var(--primary);
+  flex: 0 0 auto;
+}
+
+/* Valori nutrizionali: informazione secondaria, collassata per default. */
+.nutrition-details {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface-2);
+}
+
+.nutrition-details > summary {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: var(--tap-min);
+  padding: 0 16px;
+  color: var(--ink-2);
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  list-style: none;
+}
+
+.nutrition-details > summary::-webkit-details-marker {
+  display: none;
+}
+
+.nutrition-details > summary::before {
+  content: "";
+  width: 0;
+  height: 0;
+  border-left: 5px solid currentColor;
+  border-top: 4px solid transparent;
+  border-bottom: 4px solid transparent;
+  transition: transform 0.18s ease;
+}
+
+.nutrition-details[open] > summary::before {
+  transform: rotate(90deg);
 }
 
 .nutrition-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  margin-top: 8px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  padding: 4px 16px 18px;
 }
 
-.nutrition-grid label {
-  margin-bottom: 0;
+@media (min-width: 620px) {
+  .nutrition-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.nutrition-grid input[type="number"] {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: normal;
+  text-transform: none;
 }
 
 .form-actions {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 10px;
   margin-top: 4px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
 }
+
+@media (min-width: 560px) {
+  .form-actions {
+    flex-direction: row;
+    justify-content: flex-end;
+  }
+
+  .form-actions .primary-btn {
+    min-width: 190px;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   13. Modale "consuma"
+   ------------------------------------------------------------------------ */
 
 .modal {
   position: fixed;
-  top: 0; left: 0; width: 100%; height: 100%;
-  background: rgba(0,0,0,0.5);
-  display: flex; 
-  align-items: center; 
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
   justify-content: center;
-  z-index: 10;
-}
-.modal-content {
-  background: var(--surface);
   padding: 20px;
-  border-radius: var(--radius);
-  width: 90%; max-width: 300px;
+  background: color-mix(in srgb, #0b0f0d 62%, transparent);
+  backdrop-filter: blur(3px);
+  animation: fade-in 0.18s ease both;
 }
-.modal-actions { display: flex; gap: 8px; margin-top: 16px; }
-.modal-actions button { flex: 1; }
 
-/* Force hiding with display none */
 .modal[hidden] {
-  display: none !important;
+  display: none;
 }
 
-@media (min-width: 480px) {
-  .meal-picker { grid-template-columns: repeat(4, 1fr); }
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
 }
 
-/* Drag and Drop styles */
-.item-card.is-dragging {
-  opacity: 0.5;
-  border: 2px dashed var(--accent);
+.modal-content {
+  width: 100%;
+  max-width: 420px;
+  padding: 22px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--surface);
+  box-shadow: var(--shadow-raised);
+  animation: pop-in 0.2s cubic-bezier(0.2, 0.9, 0.3, 1.1) both;
 }
 
-details[data-category] {
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 4px;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.97);
+  }
 }
+
+.modal-content p {
+  margin: 0 0 16px;
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.35;
+  text-wrap: pretty;
+}
+
+.modal-content input[type="number"] {
+  width: 100%;
+  min-height: 62px;
+  padding: 0 16px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  color: var(--ink);
+  /* La quantita' e' l'unica cosa da leggere qui: grande e in mono. */
+  font-family: var(--font-mono);
+  font-size: 26px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.modal-content input[type="number"]:focus {
+  border-color: var(--primary);
+}
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.modal-actions button {
+  flex: 1;
+}
+
+/* ---------------------------------------------------------------------------
+   14. Stampa — lista della spesa dal frigo
+   ------------------------------------------------------------------------ */
+
+@media print {
+  .app-header,
+  .tab-nav,
+  .list-controls,
+  .item-card-consume,
+  .item-card-edit,
+  .modal {
+    display: none !important;
+  }
+
+  body {
+    padding: 0;
+    background: #fff;
+  }
+
+  .item-card {
+    break-inside: avoid;
+    box-shadow: none;
+  }
+}
+
+/* ===========================================================================
+   NOTA — attivare il misuratore di freschezza
+   ---------------------------------------------------------------------------
+   La barra in fondo alla card funziona anche senza modifiche (resta piena e
+   vale come banda di stato). Per farla svuotare davvero, in
+   js/app.js dentro buildItemCard(), subito dopo
+   `li.className = ...`, aggiungi:
+
+     const total = 14; // giorni di "pieno": oltre questa soglia la barra e' piena
+     li.style.setProperty('--freshness',
+       `${Math.max(0, Math.min(100, (days / total) * 100))}%`);
+
+   =========================================================================== */

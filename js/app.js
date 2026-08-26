@@ -223,6 +223,8 @@ function buildItemCard(item) {
 
   const li = document.createElement('li');
   li.className = `item-card status-${status}`;
+  const total = 14; // Assuming 14 days as a reference for freshness percentage calculation
+  li.style.setProperty('--freshness', `${Math.max(0, Math.min(100, (days / total) * 100))}%`);
   li.draggable = true; // Make the card draggable for drag-and-drop category movements
 
   // Drag start event
