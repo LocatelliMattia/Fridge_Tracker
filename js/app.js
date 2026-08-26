@@ -132,11 +132,44 @@ function renderList() {
     details.open = true; // Default to open
     
     const summary = document.createElement('summary');
-    summary.innerHTML = `<strong>${cat}</strong> (${groups[cat].length})`;
+    summary.innerHTML = `<strong>${cat}:</strong> ${groups[cat].length} item${groups[cat].length !== 1 ? 's' : ''}`;
     summary.className = 'category-summary';
     
     const subList = document.createElement('ul');
     subList.className = 'item-list';
+    // Allow dropping items into this category list to change their category
+    subList.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      subList.classList.add('drop-target');
+    });
+
+    subList.addEventListener('dragleave', () => {
+      subList.classList.remove('drop-target');
+    });
+
+    subList.addEventListener('drop', async (e) => {
+      e.preventDefault();
+      subList.classList.remove('drop-target');
+      const idStr = e.dataTransfer.getData('text/plain');
+      const id = Number(idStr);
+      if (!Number.isFinite(id)) return;
+
+      const item = currentItems.find(i => i.id === id);
+      if (!item) return;
+
+      // 'Senza Categoria' label maps to null category
+      const newCategory = (cat === 'Senza Categoria') ? null : cat;
+      if (item.category === newCategory) return; // nothing to change
+
+      item.category = newCategory;
+      try {
+        await window.FridgeDB.updateItem(item);
+      } catch (err) {
+        console.error('Failed to update item category', err);
+      }
+      await refreshItemsFromDB();
+    });
     
     groups[cat].forEach(item => subList.appendChild(buildItemCard(item)));
     
@@ -190,6 +223,19 @@ function buildItemCard(item) {
 
   const li = document.createElement('li');
   li.className = `item-card status-${status}`;
+  li.draggable = true; // Make the card draggable for drag-and-drop category movements
+
+  // Drag start event
+  li.addEventListener('dragstart', (e) => {
+    e.dataTransfer.setData('text/plain', item.id);
+    e.dataTransfer.effectAllowed = 'move';
+    li.classList.add('is-dragging');
+  });
+
+  // Drag end event
+  li.addEventListener('dragend', () => {
+    li.classList.remove('is-dragging');
+  });
 
   const main = document.createElement('div');
   main.className = 'item-card-main';

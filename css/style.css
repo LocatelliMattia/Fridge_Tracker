@@ -455,3 +455,16 @@ details {
 @media (min-width: 480px) {
   .meal-picker { grid-template-columns: repeat(4, 1fr); }
 }
+
+/* Drag and Drop styles */
+.item-card.is-dragging {
+  opacity: 0.5;
+  border: 2px dashed var(--accent);
+}
+
+details[data-category] {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
