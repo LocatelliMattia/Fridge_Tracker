@@ -8,16 +8,17 @@ https://locatellimattia.github.io/Fridge_Tracker/
 ---
 
 ### 🚀 Development Status
-We are currently in **Phase 2: Daily Use Enhancements**.
+We are currently in **Phase 3**.
 
 | Phase | Feature | Status |
 | :--- | :--- | :--- |
 | **1** | Field Validation & Kiosk Setup | ✅ Done |
 | **2** | Editing & Consumption | ✅ Done |
-| **3** | Smart Recommendation Engine | ⏳ Planned  |
-| **4** | OCR Expiry Date Scanning | ⏳ Planned |
-| **5** | Service Worker Robustness | ✅ Done |
-| **6** | Multi-device Sync | ❌ Future |
+| **3** | Backup & Exporting | ⏳ Planned  |
+| **4** | Smart Recommendation Engine | ⏳ Planned  |
+| **5** | OCR Expiry Date Scanning | ⏳ Planned |
+| **6** | Service Worker Robustness | ✅ Done |
+| **7** | Multi-device Sync | ❌ Future |
 
 ---
 
