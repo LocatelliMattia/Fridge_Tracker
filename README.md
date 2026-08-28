@@ -8,14 +8,14 @@ https://locatellimattia.github.io/Fridge_Tracker/
 ---
 
 ### 🚀 Development Status
-We are currently in **Phase 3**.
+We are currently in **Phase 4: Smart Recommendation Engine**.
 
 | Phase | Feature | Status |
 | :--- | :--- | :--- |
 | **1** | Field Validation & Kiosk Setup | ✅ Done |
-| **2** | Editing & Consumption | ✅ Done |
-| **3** | Backup & Exporting | ⏳ Planned  |
-| **4** | Smart Recommendation Engine | ⏳ Planned  |
+| **2** | Editing, Consumption, Search & Drag & Drop | ✅ Done |
+| **3** | Backup & Restore (JSON Import/Export) | ✅ Done |
+| **4** | Smart Recommendation Engine | ⏳ Planned |
 | **5** | OCR Expiry Date Scanning | ⏳ Planned |
 | **6** | Service Worker Robustness | ✅ Done |
 | **7** | Multi-device Sync | ❌ Future |
@@ -24,9 +24,12 @@ We are currently in **Phase 3**.
 
 ### 📖 How to Use It
 1.  **Add Items**: Go to the **"Aggiungi"** tab. Use your tablet's camera to scan a barcode or enter the product manually.
-2.  **View Inventory**: Check the **"Dispensa"** tab to see all your items, sorted automatically by expiration date.
-3.  **Consume**: Tap the **"Consuma"** button on any item card to record how much you've used. If you finish the item, it automatically disappears from your inventory!
+2.  **View Inventory**: Check the **"Dispensa"** tab to see all your items, organized by categories and sorted by expiration date. You can also drag & drop items to move them between categories.
+3.  **Edit & Consume**:
+    *   Tap **"Consuma"** on any item to record partial consumption.
+    *   Tap **"Modifica"** to edit an existing item's details (name, expiry, quantity, category, etc.).
 4.  **Meal Ideas**: Check the **"Cosa mangio"** tab for suggestions based on what's in your fridge.
+5.  **Backup & Restore**: Go to the **"Impostazioni"** tab to export your data as a JSON file or restore a previous backup.
 
 ---
 
