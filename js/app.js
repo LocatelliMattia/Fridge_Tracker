@@ -349,6 +349,43 @@ function setupAddFlow() {
   });
   document.getElementById('btn-discard-form').addEventListener('click', resetAddFlow);
   document.getElementById('add-step-form').addEventListener('submit', handleFormSubmit);
+
+  // Setup Backup
+  document.getElementById('btn-export').addEventListener('click', exportData);
+  document.getElementById('input-import').addEventListener('change', importData);
+}
+
+async function exportData() {
+  const items = await window.FridgeDB.getAllItems();
+  const blob = new Blob([JSON.stringify(items, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `frigo-backup-${new Date().toISOString().slice(0, 10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+async function importData(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    try {
+      const items = JSON.parse(e.target.result);
+      if (!Array.isArray(items)) throw new Error('Formato non valido');
+      
+      for (const item of items) {
+        await window.FridgeDB.addItem(item);
+      }
+      await refreshItemsFromDB();
+      alert('Importazione completata!');
+    } catch (err) {
+      alert('Errore nell\'importazione: ' + err.message);
+    }
+  };
+  reader.readAsText(file);
 }
 
 document.getElementById('field-category-select').addEventListener('change', (e) => {

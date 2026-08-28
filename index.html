@@ -7,10 +7,8 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#1F2A24">
 <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Space+Mono:wght@400;700&display=swap">
-<!-- <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet"> -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -21,6 +19,7 @@
     <button class="tab-btn is-active" data-view="list">Dispensa</button>
     <button class="tab-btn" data-view="suggest">Cosa mangio</button>
     <button class="tab-btn" data-view="add">Aggiungi</button>
+    <button class="tab-btn" data-view="settings">Impostazioni</button>
   </nav>
 </header>
 
@@ -152,6 +151,21 @@
       </div>
     </form>
 
+  </section>
+
+  <!-- VIEW: Settings / Backup -->
+  <section id="view-settings" class="view">
+    <div class="add-step">
+      <h2>Backup Dati</h2>
+      <button class="primary-btn" id="btn-export">Esporta JSON</button>
+      <label class="secondary-btn" style="text-align: center; padding-top: 15px; cursor: pointer;">
+        Importa JSON
+        <input type="file" id="input-import" accept=".json" hidden>
+      </label>
+      <p class="hint-text" style="font-size: 12px; color: var(--text-secondary);">
+        Esporta regolarmente il tuo database locale per evitare la perdita di dati.
+      </p>
+    </div>
   </section>
   
   <!-- Modal for consuming an item -->
