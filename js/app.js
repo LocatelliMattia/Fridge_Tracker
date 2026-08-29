@@ -15,6 +15,7 @@ async function init() {
   setupMealPicker();
   setupAddFlow();
   setupListControls();
+  resetAddFlow();
   await refreshItemsFromDB();
   registerServiceWorker();
 }
@@ -87,6 +88,10 @@ function switchView(viewName) {
   document.querySelectorAll('.view').forEach((section) => {
     section.classList.toggle('is-active', section.id === `view-${viewName}`);
   });
+
+  if (viewName === 'add') {
+    resetAddFlow();
+  }
 
   // Leaving the "add" view while the camera is running should stop it.
   if (viewName !== 'add') {
@@ -335,10 +340,17 @@ function renderSuggestions() {
 function setupAddFlow() {
   document.getElementById('btn-start-scan').addEventListener('click', beginScanning);
   document.getElementById('btn-cancel-scan').addEventListener('click', cancelScanning);
-  document.getElementById('btn-manual-entry').addEventListener('click', () => {
+  document.getElementById('btn-cancel-manual-barcode').addEventListener('click', resetAddFlow);
+
+  document.getElementById('btn-show-manual-barcode').addEventListener('click', () => {
+    showAddStep('add-step-manual-barcode');
+  });
+
+  document.getElementById('btn-show-manual-form').addEventListener('click', () => {
     pendingBarcode = null;
     showFormStep({});
   });
+  
   document.getElementById('manual-barcode-form').addEventListener('submit', (event) => {
     event.preventDefault();
     const input = document.getElementById('field-manual-barcode');
@@ -397,6 +409,11 @@ function showAddStep(stepId) {
   document.querySelectorAll('#view-add .add-step').forEach((el) => {
     el.hidden = el.id !== stepId;
   });
+
+  const manualInput = document.getElementById('field-manual-barcode');
+  if (manualInput) {
+    manualInput.value = stepId === 'add-step-manual-barcode' ? manualInput.value : '';
+  }
 }
 
 async function beginScanning() {
@@ -604,7 +621,14 @@ function numberOrNull(fieldId) {
 function resetAddFlow() {
   pendingBarcode = null;
   editingId = null; // Reset editing state
-  document.getElementById('add-step-form').reset();
+  const addStepForm = document.getElementById('add-step-form');
+  const newCategoryInput = document.getElementById('field-category-new');
+  const manualBarcodeInput = document.getElementById('field-manual-barcode');
+
+  if (manualBarcodeInput) manualBarcodeInput.value = '';
+  if (addStepForm) addStepForm.reset();
+  if (newCategoryInput) newCategoryInput.style.display = 'none';
+
   showAddStep('add-step-choice');
 }
 

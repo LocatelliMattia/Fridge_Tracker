@@ -65,7 +65,12 @@
     <!-- Add step 1: choose how to add -->
     <div class="add-step" id="add-step-choice">
       <button class="primary-btn" id="btn-start-scan">Scansiona barcode</button>
+      <button class="secondary-btn" id="btn-show-manual-barcode">Inserisci codice a mano</button>
+      <button class="secondary-btn" id="btn-show-manual-form">Inserisci manualmente (senza barcode)</button>
+    </div>
 
+    <!-- Add step 2: manual barcode lookup -->
+    <div class="add-step" id="add-step-manual-barcode" hidden>
       <form class="manual-barcode-form" id="manual-barcode-form">
         <label>
           Codice a barre non leggibile? Inseriscilo a mano
@@ -75,18 +80,17 @@
           </div>
         </label>
       </form>
-
-      <button class="secondary-btn" id="btn-manual-entry">Inserisci manualmente (senza barcode)</button>
+      <button class="secondary-btn" id="btn-cancel-manual-barcode">Annulla</button>
     </div>
 
-    <!-- Add step 2: camera scanning -->
+    <!-- Add step 3: camera scanning -->
     <div class="add-step" id="add-step-scan" hidden>
       <div id="scanner-viewport"></div>
       <p class="hint-text">Inquadra il codice a barre della confezione.</p>
       <button class="secondary-btn" id="btn-cancel-scan">Annulla</button>
     </div>
 
-    <!-- Add step 3: confirm / fill product details -->
+    <!-- Add step 4: confirm / fill product details -->
     <form class="add-step item-form" id="add-step-form" hidden>
       <p class="form-status" id="form-status"></p>
 

@@ -110,6 +110,14 @@
   box-sizing: border-box;
 }
 
+/* L'attributo hidden deve vincere sempre, anche su elementi con display
+   flex/grid impostato da altre regole (es. .add-step). Senza questa
+   regola, [hidden] dello user-agent stylesheet viene sovrascritto dalle
+   regole del nostro foglio di stile e l'elemento resta visibile. */
+[hidden] {
+  display: none !important;
+}
+
 html {
   background: var(--bg);
   /* Evita che iOS ingrandisca il testo in landscape sul tablet appeso. */
@@ -763,6 +771,19 @@ details[open] > .category-summary::before {
   max-width: 660px;
 }
 
+#view-add .add-step {
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow-card);
+}
+
+#view-add .add-step > .primary-btn,
+#view-add .add-step > .secondary-btn {
+  width: 100%;
+}
+
 .primary-btn,
 .secondary-btn {
   min-height: var(--tap-min);
@@ -824,6 +845,11 @@ details[open] > .category-summary::before {
   border: 1px solid var(--line);
   border-radius: var(--radius);
   background: var(--surface-2);
+  margin-top: 4px;
+}
+
+.manual-barcode-form[hidden] {
+  display: none;
 }
 
 .hint-text {
@@ -1235,17 +1261,3 @@ details[open] > .category-summary::before {
     box-shadow: none;
   }
 }
-
-/* ===========================================================================
-   NOTA — attivare il misuratore di freschezza
-   ---------------------------------------------------------------------------
-   La barra in fondo alla card funziona anche senza modifiche (resta piena e
-   vale come banda di stato). Per farla svuotare davvero, in
-   js/app.js dentro buildItemCard(), subito dopo
-   `li.className = ...`, aggiungi:
-
-     const total = 14; // giorni di "pieno": oltre questa soglia la barra e' piena
-     li.style.setProperty('--freshness',
-       `${Math.max(0, Math.min(100, (days / total) * 100))}%`);
-
-   =========================================================================== */
