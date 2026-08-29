@@ -326,12 +326,16 @@ function setupMealPicker() {
 function renderSuggestions() {
   const listEl = document.getElementById('suggest-list');
   const emptyEl = document.getElementById('suggest-empty-state');
+  const balancedEl = document.getElementById('balanced-list');
 
   const suggestions = window.Recommend.suggestForMeal(currentItems, activeMeal);
+  const balanced = window.Recommend.suggestBalancedMeal(currentItems, activeMeal);
+
+  balancedEl.innerHTML = '';
+  balanced.forEach((item) => balancedEl.appendChild(buildItemCard(item)));
 
   listEl.innerHTML = '';
   emptyEl.hidden = suggestions.length > 0;
-
   suggestions.forEach((item) => listEl.appendChild(buildItemCard(item)));
 }
 
@@ -389,6 +393,7 @@ async function importData(event) {
       if (!Array.isArray(items)) throw new Error('Formato non valido');
       
       for (const item of items) {
+        delete item.id; // Remove ID to avoid conflicts
         await window.FridgeDB.addItem(item);
       }
       await refreshItemsFromDB();

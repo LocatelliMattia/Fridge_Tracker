@@ -66,8 +66,55 @@ function matchesMeal(item, mealType) {
   return item.mealTags.includes(mealType);
 }
 
+/**
+ * Classifies an item by its dominant macro-nutrient role, using the
+ * nutriments already stored per item (per 100g). This is a rule-based
+ * heuristic, not a nutrition score — good enough to avoid suggesting
+ * three sugary snacks in a row, not meant to be dietetically precise.
+ *
+ * Returns one of: 'protein' | 'fiber' | 'carbs' | 'treat' | 'other'
+ */
+function macroRole(item) {
+  const n = item.nutriments || {};
+  if (n.proteins != null && n.proteins >= 10) return 'protein';
+  if (n.fiber != null && n.fiber >= 3) return 'fiber';
+  if (n.sugars != null && n.sugars >= 15) return 'treat';
+  if (n.carbs != null && n.carbs >= 20) return 'carbs';
+  return 'other';
+}
+
+/**
+ * Builds a small "balanced basket" for a meal instead of a flat
+ * expiry-sorted list: picks the most urgent item for each missing
+ * macro role first, then fills remaining slots by pure urgency.
+ * Urgency always wins over diversity — an item expiring today is never
+ * skipped just because its role is already covered.
+ */
+function suggestBalancedMeal(items, mealType, basketSize = 4) {
+  const candidates = suggestForMeal(items, mealType, { includeExpired: false });
+  const basket = [];
+  const rolesCovered = new Set();
+
+  for (const item of candidates) {
+    if (basket.length >= basketSize) break;
+    const role = macroRole(item);
+    const isUrgent = freshnessStatus(item) === 'urgent';
+    if (isUrgent || !rolesCovered.has(role)) {
+      basket.push(item);
+      rolesCovered.add(role);
+    }
+  }
+  for (const item of candidates) {
+    if (basket.length >= basketSize) break;
+    if (!basket.includes(item)) basket.push(item);
+  }
+  return basket;
+}
+
 window.Recommend = {
   daysUntilExpiry,
   freshnessStatus,
   suggestForMeal,
+  macroRole,
+  suggestBalanceMeal,
 };

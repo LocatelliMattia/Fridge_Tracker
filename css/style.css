@@ -247,6 +247,13 @@ textarea {
   color: var(--primary-ink);
 }
 
+.section-heading {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin: 20px 0 8px;
+}
+
 /* Tablet e oltre: navigazione in linea nell'header. */
 @media (min-width: 700px) {
   body {
