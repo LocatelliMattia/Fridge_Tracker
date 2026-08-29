@@ -116,5 +116,5 @@ window.Recommend = {
   freshnessStatus,
   suggestForMeal,
   macroRole,
-  suggestBalanceMeal,
+  suggestBalancedMeal,
 };
