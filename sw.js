@@ -4,7 +4,7 @@
 // simply fall back to manual entry (handled in app.js).
 
 // sw.js — Caches only the static app shell.
-const CACHE_NAME = 'fridge-tracker-shell-v4';
+const CACHE_NAME = 'fridge-tracker-shell-v5';
 
 const SHELL_FILES = [
   './',

@@ -15,6 +15,7 @@ async function init() {
   setupMealPicker();
   setupAddFlow();
   setupListControls();
+  setupSettings();
   resetAddFlow();
   await refreshItemsFromDB();
   registerServiceWorker();
@@ -97,6 +98,47 @@ function switchView(viewName) {
   if (viewName !== 'add') {
     window.BarcodeScanner.stopScanning();
   }
+}
+
+// ---- Settings ---------------------------------------------------
+
+function setupSettings() {
+  const select = document.getElementById('country-select');
+  const customInput = document.getElementById('country-custom');
+  if (!select || !customInput) return;
+
+  const savedCode = localStorage.getItem('off_country_code') || 'it';
+  const optionExists = Array.from(select.options).some(o => o.value === savedCode);
+
+  if (optionExists) {
+    select.value = savedCode;
+    customInput.hidden = true;
+    customInput.value = '';
+  } else {
+    select.value = 'NEW_COUNTRY';
+    customInput.hidden = false;
+    customInput.value = savedCode;
+  }
+
+  select.addEventListener('change', () => {
+    if (select.value === 'NEW_COUNTRY') {
+      customInput.hidden = false;
+      customInput.focus();
+      const val = customInput.value.trim().toLowerCase();
+      if (val) localStorage.setItem('off_country_code', val);
+    } else {
+      customInput.hidden = true;
+      customInput.value = '';
+      localStorage.setItem('off_country_code', select.value);
+    }
+  });
+
+  customInput.addEventListener('input', () => {
+    const val = customInput.value.trim().toLowerCase();
+    if (val) {
+      localStorage.setItem('off_country_code', val);
+    }
+  });
 }
 
 // ---- "Dispensa" list ---------------------------------------------------

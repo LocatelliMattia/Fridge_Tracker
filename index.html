@@ -174,6 +174,21 @@
         Esporta regolarmente il tuo database locale per evitare la perdita di dati.
       </p>
     </div>
+
+    <div class="add-step" style="margin-top: 20px;">
+      <h2>Open Food Facts</h2>
+      <label for="country-select" class="form-label">Paese database:</label>
+      <select id="country-select" style="width: 100%; padding: 10px; margin-top: 5px;">
+        <option value="world">Mondo</option>
+        <option value="it">Italia</option>
+        <option value="de">Germania</option>
+        <option value="fr">Francia</option>
+        <option value="se">Svezia</option>
+        <option value="us">Stati Uniti</option>
+        <option value="NEW_COUNTRY">+ Inserisci codice personalizzato...</option>
+      </select>
+      <input type="text" id="country-custom" placeholder="Es. ch, uk, br..." style="width: 100%; padding: 10px; margin-top: 10px;" hidden>
+    </div>
   </section>
   
   <!-- Modal for consuming an item -->

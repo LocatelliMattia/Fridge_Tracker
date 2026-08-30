@@ -2,13 +2,20 @@
 // Docs: https://openfoodfacts.github.io/openfoodfacts-server/api/
 // No API key required. We only need read access (product lookup by barcode).
 
-const OFF_BASE_URL = 'https://it.openfoodfacts.org/api/v2/product'; // 'https://world.openfoodfacts.org/api/v2/product';
-
 // Open Food Facts asks integrators to identify their app via User-Agent,
 // but browsers block setting a custom User-Agent header from JS — this is
 // only enforceable from server-side code. Left here as documentation for
 // anyone who later proxies these calls through a backend.
 // const USER_AGENT = 'FridgeTracker/0.1 (personal project)';
+
+/**
+ * Gets the base URL for Open Food Facts, defaulting to the global version.
+ * Can be overridden by storing 'off_country_code' in localStorage.
+ */
+function getOFFBaseUrl() {
+  const countryCode = localStorage.getItem('off_country_code') || 'world';
+  return `https://${countryCode}.openfoodfacts.org/api/v2/product`;
+}
 
 /**
  * Looks up a product by its barcode (EAN-13 / UPC-A).
@@ -25,7 +32,7 @@ async function lookupByBarcode(barcode) {
     'quantity',
   ].join(',');
 
-  const url = `${OFF_BASE_URL}/${encodeURIComponent(barcode)}.json?fields=${fields}`;
+  const url = `${getOFFBaseUrl()}/${encodeURIComponent(barcode)}.json?fields=${fields}`;
 
   const response = await fetch(url);
   if (!response.ok) {
