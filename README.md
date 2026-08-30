@@ -15,7 +15,8 @@ We are currently in **Phase 4: Smart Recommendation Engine**.
 | **1** | Field Validation & Kiosk Setup | ✅ Done |
 | **2** | Editing, Consumption, Search & Drag & Drop | ✅ Done |
 | **3** | Backup & Restore (JSON Import/Export) | ✅ Done |
-| **4** | Smart Recommendation Engine | ⏳ Planned |
+| **4** | Smart Recommendation Engine | 🚧 In Progress |
+*Note: The balanced meal suggestion engine uses a heuristic approach and is currently being refined. This is not medical advice; please use your judgment when following suggestions.*
 | **5** | OCR Expiry Date Scanning | ⏳ Planned |
 | **6** | Service Worker Robustness | ✅ Done |
 | **7** | Multi-device Sync | ❌ Future |
